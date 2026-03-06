@@ -22,6 +22,12 @@ class StockAllocator
         $lots = StockLot::query()
             ->where('item_id', $item->id)
             ->available()
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhereDate('expires_at', '>=', now()->toDateString());
+            })
+            ->orderByRaw('CASE WHEN expires_at IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('expires_at')
             ->orderBy('purchased_at')
             ->lockForUpdate()
             ->get();

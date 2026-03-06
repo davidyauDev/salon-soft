@@ -8,7 +8,13 @@ export interface InventoryItem {
   base_unit: string
   sale_price: number | null
   stock_minimum: number
+  sku: string | null
+  barcode: string | null
+  reorder_point: number
+  reorder_qty: number
   stock_total: number
+  category: { id: number; name: string } | null
+  brand: { id: number; name: string } | null
   units: Array<{ id: number; unit: string; factor_to_base: number; is_base: boolean }>
   lots: Array<{ id: number; quantity_remaining: number; cost_per_base: number }>
 }
@@ -37,6 +43,12 @@ export function useInventory() {
     base_unit: string
     sale_price?: number | null
     stock_minimum?: number | null
+    category_id?: number | null
+    brand_id?: number | null
+    sku?: string | null
+    barcode?: string | null
+    reorder_point?: number | null
+    reorder_qty?: number | null
   }): Promise<void> {
     await apiFetch('/api/items', {
       method: 'POST',
@@ -50,6 +62,10 @@ export function useInventory() {
     quantity: number
     unit: string
     cost_per_unit: number
+    supplier_id?: number | null
+    lot_code?: string | null
+    invoice_number?: string | null
+    expires_at?: string | null
   }): Promise<void> {
     await apiFetch('/api/purchases', {
       method: 'POST',

@@ -53,6 +53,13 @@ class ReturnService
                     throw new InvalidArgumentException('Return quantity exceeds sold quantity.');
                 }
 
+                $returnedBase = (float) $saleItem->saleReturnItems()
+                    ->sum('quantity_base');
+
+                if ($quantityBase + $returnedBase > (float) $saleItem->quantity_base) {
+                    throw new InvalidArgumentException('Return quantity exceeds remaining sold quantity.');
+                }
+
                 $refundUnitBase = (float) $line['refund_unit'] / $factor;
 
                 $restockedLot = StockLot::query()->create([

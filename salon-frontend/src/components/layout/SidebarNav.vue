@@ -15,7 +15,7 @@ const route = useRoute()
 
 const navItems = computed(() => [
   { label: 'Dashboard', to: '/', badge: 'Hoy' },
-  { label: 'Inventario', to: '/inventario', badge: 'Stock' },
+  { label: 'Productos', to: '/inventario', badge: 'Stock' },
   { label: 'Servicios', to: '/servicios', badge: 'Agenda' },
   { label: 'Ventas', to: '/ventas', badge: 'POS' },
   { label: 'Clientes', to: '/clientes', badge: 'Historial' },

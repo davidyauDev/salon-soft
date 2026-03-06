@@ -4,8 +4,20 @@ import { apiFetch, unwrapData } from '../lib/api'
 export interface ClientProfile {
   id: number
   full_name: string
-  phone?: string
-  email?: string
+  first_name?: string | null
+  last_name?: string | null
+  phone?: string | null
+  email?: string | null
+  dni?: string | null
+  address?: string | null
+  birth_date?: string | null
+  gender?: string | null
+  notes?: string | null
+  created_at?: string | null
+  service_count?: number
+  services_total?: number
+  sales_total?: number
+  total_sales?: number
 }
 
 export interface ClientHistory {
@@ -15,6 +27,7 @@ export interface ClientHistory {
     performed_at: string
     total_amount: number
     service?: { name: string }
+    stylist?: { user?: { name: string } }
   }>
   sales: Array<{
     id: number
@@ -38,12 +51,14 @@ export function useClients() {
     }
   }
 
-  async function create(payload: Record<string, unknown>): Promise<void> {
-    await apiFetch('/api/clients', {
+  async function create(payload: Record<string, unknown>): Promise<ClientProfile> {
+    const response = await apiFetch<ClientProfile>('/api/clients', {
       method: 'POST',
       body: JSON.stringify(payload),
     })
+    const created = unwrapData(response)
     await load()
+    return created
   }
 
   async function update(clientId: number, payload: Record<string, unknown>): Promise<void> {

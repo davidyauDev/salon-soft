@@ -25,10 +25,10 @@ class StoreServiceRecordRequest extends FormRequest
             'payment_method' => ['nullable', Rule::enum(PaymentMethod::class)],
             'performed_at' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
-            'consumptions' => ['required', 'array', 'min:1'],
-            'consumptions.*.item_id' => ['required', 'exists:items,id'],
-            'consumptions.*.quantity' => ['required', 'numeric', 'gt:0'],
-            'consumptions.*.unit' => ['required', 'string', 'max:20'],
+            'consumptions' => ['nullable', 'array'],
+            'consumptions.*.item_id' => ['required_with:consumptions', 'exists:items,id'],
+            'consumptions.*.quantity' => ['required_with:consumptions', 'numeric', 'gt:0'],
+            'consumptions.*.unit' => ['required_with:consumptions', 'string', 'max:20'],
         ];
     }
 }

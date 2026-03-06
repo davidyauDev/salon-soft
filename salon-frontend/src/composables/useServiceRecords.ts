@@ -12,18 +12,20 @@ export interface ServiceRecord {
   client_id?: number | null
   service?: { name: string }
   stylist?: { user?: { name: string } }
-  client?: { full_name: string }
+  client?: { full_name: string; phone?: string | null; email?: string | null }
 }
 
 const loading = shallowRef(false)
 const records = shallowRef<ServiceRecord[]>([])
+const total = shallowRef(0)
 
 export function useServiceRecords() {
   async function load(): Promise<void> {
     loading.value = true
     try {
-      const response = await apiFetch<{ data: ServiceRecord[] }>('/api/service-records')
+      const response = await apiFetch<{ data: ServiceRecord[]; meta?: { total?: number } }>('/api/service-records')
       records.value = unwrapData(response)
+      total.value = response?.meta?.total ?? records.value.length
     } finally {
       loading.value = false
     }
@@ -53,6 +55,7 @@ export function useServiceRecords() {
   return {
     loading,
     records,
+    total,
     load,
     create,
     update,
