@@ -15,16 +15,43 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+    private function resolveFullName(array $payload, ?Client $client = null): string
+    {
+        $firstName = array_key_exists('first_name', $payload)
+            ? (string) ($payload['first_name'] ?? '')
+            : (string) ($client?->first_name ?? '');
+
+        $lastName = array_key_exists('last_name', $payload)
+            ? (string) ($payload['last_name'] ?? '')
+            : (string) ($client?->last_name ?? '');
+
+        $fullName = array_key_exists('full_name', $payload)
+            ? (string) ($payload['full_name'] ?? '')
+            : (string) ($client?->full_name ?? '');
+
+        $composed = trim(trim($firstName) . ' ' . trim($lastName));
+
+        return $composed !== '' ? $composed : trim($fullName);
+    }
+
     public function index(): JsonResponse
     {
-        $clients = Client::query()->orderBy('full_name')->get();
+        $clients = Client::query()
+            ->withCount('serviceRecords')
+            ->withSum('serviceRecords', 'total_amount')
+            ->withSum('sales', 'total_amount')
+            ->orderBy('full_name')
+            ->get();
 
         return response()->json(ClientResource::collection($clients));
     }
 
     public function store(StoreClientRequest $request): JsonResponse
     {
-        $client = Client::query()->create($request->validated());
+        $payload = $request->validated();
+        $payload['full_name'] = $this->resolveFullName($payload);
+
+        $client = Client::query()->create($payload);
 
         return response()->json(new ClientResource($client), 201);
     }
@@ -56,7 +83,13 @@ class ClientController extends Controller
     public function update(UpdateClientRequest $request, Client $client, AuditLogger $logger): JsonResponse
     {
         $before = $client->getAttributes();
-        $client->update($request->validated());
+        $payload = $request->validated();
+
+        if (array_key_exists('first_name', $payload) || array_key_exists('last_name', $payload) || array_key_exists('full_name', $payload)) {
+            $payload['full_name'] = $this->resolveFullName($payload, $client);
+        }
+
+        $client->update($payload);
 
         $client->refresh();
         $logger->log('update', $client, $request->user()?->id, $before, $client->getAttributes(), $request);

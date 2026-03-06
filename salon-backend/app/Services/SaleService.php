@@ -45,6 +45,10 @@ class SaleService
                 /** @var Item $item */
                 $item = Item::query()->findOrFail($line['item_id']);
 
+                if (!$item->is_active) {
+                    throw new \InvalidArgumentException('Item is inactive.');
+                }
+
                 if ($item->type === ItemType::ConsumeOnly) {
                     throw new \InvalidArgumentException('Item not available for sale.');
                 }

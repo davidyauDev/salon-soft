@@ -97,10 +97,10 @@ const commissions = computed(() => {
       <section class="panel panel-secondary">
         <header class="panel-header">
           <div>
-            <p class="panel-eyebrow">Inventario</p>
+            <p class="panel-eyebrow">Productos</p>
             <h2>Alertas de stock</h2>
           </div>
-          <button type="button">Ver kardex</button>
+          <button type="button">Ver productos</button>
         </header>
         <div class="panel-body">
           <div v-for="alert in alerts" :key="alert.id" class="alert-row">

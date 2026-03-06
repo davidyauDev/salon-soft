@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SaleItem extends Model
 {
@@ -43,5 +44,10 @@ class SaleItem extends Model
     public function stockLot(): BelongsTo
     {
         return $this->belongsTo(StockLot::class);
+    }
+
+    public function saleReturnItems(): HasMany
+    {
+        return $this->hasMany(ReturnItem::class);
     }
 }

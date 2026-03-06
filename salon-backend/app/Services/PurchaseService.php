@@ -17,7 +17,18 @@ class PurchaseService
     }
 
     /**
-     * @param array{item_id:int, quantity:float, unit:string, cost_per_unit:float, purchased_at?:string|null, expires_at?:string|null, notes?:string|null} $payload
+     * @param array{
+     *   item_id:int,
+     *   quantity:float,
+     *   unit:string,
+     *   cost_per_unit:float,
+     *   supplier_id?:int|null,
+     *   lot_code?:string|null,
+     *   invoice_number?:string|null,
+     *   purchased_at?:string|null,
+     *   expires_at?:string|null,
+     *   notes?:string|null
+     * } $payload
      */
     public function create(array $payload, ?int $userId): StockLot
     {
@@ -25,16 +36,23 @@ class PurchaseService
             /** @var Item $item */
             $item = Item::query()->findOrFail($payload['item_id']);
 
+            if (!$item->is_active) {
+                throw new \InvalidArgumentException('Item is inactive.');
+            }
+
             $factor = $this->unitConverter->factorToBase($item, $payload['unit']);
             $quantityBase = (float) $payload['quantity'] * $factor;
             $unitCostBase = (float) $payload['cost_per_unit'] / $factor;
 
             $lot = StockLot::query()->create([
                 'item_id' => $item->id,
+                'supplier_id' => $payload['supplier_id'] ?? null,
                 'quantity_remaining' => $quantityBase,
                 'cost_per_base' => $unitCostBase,
                 'purchased_at' => $payload['purchased_at'] ?? now(),
                 'expires_at' => $payload['expires_at'] ?? null,
+                'lot_code' => $payload['lot_code'] ?? null,
+                'invoice_number' => $payload['invoice_number'] ?? null,
                 'notes' => $payload['notes'] ?? null,
             ]);
 
