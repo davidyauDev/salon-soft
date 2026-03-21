@@ -11,6 +11,7 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -42,11 +43,10 @@ class CategoryController extends Controller
 
     public function destroy(Request $request, Category $category): JsonResponse
     {
-        if ($category->items()->exists()) {
-            return response()->json(['message' => 'Category has items and cannot be deleted.'], 422);
-        }
-
-        $category->delete();
+        DB::transaction(function () use ($category) {
+            $category->items()->update(['category_id' => null]);
+            $category->delete();
+        });
 
         return response()->json(status: 204);
     }

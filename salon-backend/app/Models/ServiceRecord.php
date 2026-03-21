@@ -20,8 +20,10 @@ class ServiceRecord extends Model
         'service_id',
         'stylist_id',
         'client_id',
+        'sale_id',
         'total_amount',
         'status',
+        'source',
         'payment_method',
         'performed_at',
         'notes',
@@ -50,6 +52,11 @@ class ServiceRecord extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function sale(): BelongsTo
+    {
+        return $this->belongsTo(Sale::class);
     }
 
     public function consumptions(): HasMany

@@ -50,16 +50,50 @@ function formatStock(value: number): string {
         <span class="price">{{ formatCurrency(Number(item.sale_price ?? 0)) }}</span>
         <div class="row-actions">
           <button class="icon-btn" type="button" @click="emit('edit', item)" aria-label="Editar">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
-                d="M4 16.5V20h3.5L18 9.5l-3.5-3.5L4 16.5Zm16.7-10.8a1 1 0 0 0 0-1.4l-1-1a1 1 0 0 0-1.4 0l-1.6 1.6 3.5 3.5 1.5-1.7Z"
+                d="M12 20h9"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               />
             </svg>
           </button>
           <button class="icon-btn danger" type="button" @click="emit('remove', item)" aria-label="Eliminar">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
-                d="M9 3h6l1 2h4v2H4V5h4l1-2Zm1 6h2v8h-2V9Zm4 0h2v8h-2V9Zm-8 0h2v8H6V9Z"
+                d="M3 6h18"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+              />
+              <path
+                d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M19 6l-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M10 11v6M14 11v6"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
               />
             </svg>
           </button>
@@ -144,39 +178,45 @@ function formatStock(value: number): string {
 }
 
 .actions-col {
-  text-align: right;
+  text-align: center;
 }
 
 .row-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #fff;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
   display: grid;
   place-items: center;
   cursor: pointer;
+  color: #1f1d29;
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .icon-btn svg {
-  width: 16px;
-  height: 16px;
-  fill: #1f1d29;
+  width: 18px;
+  height: 18px;
+  overflow: visible;
 }
 
 .icon-btn.danger {
-  border-color: rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.08);
+  color: #ff2f6d;
 }
 
-.icon-btn.danger svg {
-  fill: #ef4444;
+.icon-btn:hover {
+  opacity: 0.72;
+  transform: translateY(-1px);
 }
 
 .table-empty {

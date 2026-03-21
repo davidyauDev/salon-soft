@@ -34,6 +34,11 @@ watch(
   { immediate: true },
 )
 
+function requestClose(): void {
+  if (props.saving) return
+  emit('close')
+}
+
 function handleSubmit(): void {
   if (!form.name.trim()) return
   emit('submit', { name: form.name.trim(), is_active: form.is_active })
@@ -41,8 +46,16 @@ function handleSubmit(): void {
 </script>
 
 <template>
-  <div v-if="props.open" class="modal-backdrop" @click.self="emit('close')">
+  <div v-if="props.open" class="modal-backdrop" @click.self="requestClose">
     <div class="modal-card">
+      <div v-if="props.saving" class="saving-overlay" aria-live="polite">
+        <span class="saving-spinner" aria-hidden="true"></span>
+        <div class="saving-copy">
+          <strong>{{ isEditing ? 'Actualizando categoria...' : 'Creando categoria...' }}</strong>
+          <p>Guardando cambios y cerrando el formulario.</p>
+        </div>
+      </div>
+
       <header class="modal-header">
         <div>
           <h3>{{ isEditing ? 'Editar categoria' : 'Nueva categoria' }}</h3>
@@ -50,23 +63,24 @@ function handleSubmit(): void {
             {{ isEditing ? 'Actualiza el nombre y estado de la categoria.' : 'Crea una categoria para organizar tus servicios.' }}
           </p>
         </div>
-        <button class="close-button" type="button" @click="emit('close')">X</button>
+        <button class="close-button" type="button" :disabled="props.saving" @click="requestClose">X</button>
       </header>
 
       <form class="form-grid" @submit.prevent="handleSubmit">
         <label>
           Nombre de la categoria
-          <input v-model="form.name" required placeholder="Ej: Cortes de Cabello" />
+          <input v-model="form.name" required placeholder="Ej: Cortes de Cabello" :disabled="props.saving" />
         </label>
         <label class="toggle-field">
           <span>Categoria activa</span>
-          <input v-model="form.is_active" type="checkbox" />
+          <input v-model="form.is_active" type="checkbox" :disabled="props.saving" />
         </label>
         <div class="form-actions">
-          <button class="btn-primary" type="submit" :disabled="props.saving">
+          <button class="btn-primary submit-btn" type="submit" :disabled="props.saving">
+            <span v-if="props.saving" class="btn-spinner" aria-hidden="true"></span>
             {{ isEditing ? 'Guardar cambios' : 'Crear categoria' }}
           </button>
-          <button class="btn-ghost" type="button" :disabled="props.saving" @click="emit('close')">
+          <button class="btn-ghost" type="button" :disabled="props.saving" @click="requestClose">
             Cancelar
           </button>
         </div>
@@ -87,6 +101,7 @@ function handleSubmit(): void {
 }
 
 .modal-card {
+  position: relative;
   width: min(520px, 100%);
   background: var(--panel-bg);
   border-radius: var(--radius-lg);
@@ -95,6 +110,46 @@ function handleSubmit(): void {
   padding: 22px;
   display: grid;
   gap: 16px;
+}
+
+.saving-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-lg);
+}
+
+.saving-copy {
+  display: grid;
+  gap: 4px;
+  max-width: 240px;
+}
+
+.saving-copy strong {
+  color: #1f1d29;
+}
+
+.saving-copy p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.saving-spinner,
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(90, 75, 255, 0.18);
+  border-top-color: #5a4bff;
+  animation: spin 0.8s linear infinite;
 }
 
 .modal-header {
@@ -114,6 +169,11 @@ function handleSubmit(): void {
   font-size: 1rem;
 }
 
+.close-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .toggle-field {
   display: flex;
   align-items: center;
@@ -129,5 +189,25 @@ function handleSubmit(): void {
 .toggle-field input {
   width: 42px;
   height: 22px;
+}
+
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-color: rgba(255, 255, 255, 0.28);
+  border-top-color: #fff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

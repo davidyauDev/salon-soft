@@ -5,14 +5,28 @@ export interface ServiceRecord {
   id: number
   performed_at: string
   total_amount: number
+  products_total?: number
+  grand_total?: number
   status?: string
+  source?: string
   payment_method?: string | null
   service_id?: number
   stylist_id?: number
   client_id?: number | null
-  service?: { name: string }
+  sale_id?: number | null
+  service?: { name: string; duration_min?: number | null }
   stylist?: { user?: { name: string } }
   client?: { full_name: string; phone?: string | null; email?: string | null }
+  sale?: {
+    id: number
+    total_amount: number
+    items?: Array<{
+      id: number
+      quantity_base: number
+      unit_price_base: number
+      item?: { name: string }
+    }>
+  } | null
 }
 
 const loading = shallowRef(false)

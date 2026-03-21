@@ -22,7 +22,7 @@ class ServiceRecordController extends Controller
     public function index(): JsonResponse
     {
         $records = \App\Models\ServiceRecord::query()
-            ->with(['service', 'stylist.user', 'client'])
+            ->with(['service', 'stylist.user', 'client', 'sale.items.item'])
             ->latest('performed_at')
             ->paginate(20);
 

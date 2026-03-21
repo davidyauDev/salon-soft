@@ -7,6 +7,9 @@ const props = defineProps<{
   loading: boolean
   emptyText: string
 }>()
+const emit = defineEmits<{
+  (e: 'detail', row: SaleRecord): void
+}>()
 
 function productNames(items: SaleRecord['items']): string[] {
   if (!items?.length) return []
@@ -37,7 +40,7 @@ function productNames(items: SaleRecord['items']): string[] {
         </div>
         <span>{{ formatDate(row.sold_at) }}</span>
         <span class="amount">{{ formatCurrency(Number(row.total_amount)) }}</span>
-        <button class="icon-btn" type="button" aria-label="Detalle">
+        <button class="icon-btn" type="button" aria-label="Detalle" @click="emit('detail', row)">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M7 7h10v2H7V7Zm0 4h10v2H7v-2Zm0 4h6v2H7v-2Z"
@@ -132,3 +135,4 @@ function productNames(items: SaleRecord['items']): string[] {
   text-align: right;
 }
 </style>
+
