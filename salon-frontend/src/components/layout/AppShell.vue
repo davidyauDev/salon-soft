@@ -46,8 +46,9 @@ const auth = useAuth()
   }
 
   .app-main {
-    padding: 24px 18px 28px;
+    padding: 16px 14px 22px;
     border-left: none;
+    gap: 16px;
   }
 }
 </style>

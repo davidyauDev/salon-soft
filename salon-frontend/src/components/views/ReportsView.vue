@@ -39,9 +39,9 @@ onMounted(() => {
           <span>Minimo</span>
         </div>
         <div v-for="item in reports.stockLow.value" :key="item.id" class="table-row">
-          <span>{{ item.name }}</span>
-          <span>{{ item.stock_total.toFixed(2) }} {{ item.base_unit }}</span>
-          <span>{{ item.stock_minimum }} {{ item.base_unit }}</span>
+          <span data-label="Item">{{ item.name }}</span>
+          <span data-label="Stock">{{ item.stock_total.toFixed(2) }} {{ item.base_unit }}</span>
+          <span data-label="Minimo">{{ item.stock_minimum }} {{ item.base_unit }}</span>
         </div>
       </div>
     </section>
@@ -82,5 +82,42 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-head {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+    border-top: 1px solid rgba(17, 15, 20, 0.06);
+    background: rgba(255, 253, 251, 0.92);
+    border-radius: 16px;
+    margin-top: 10px;
+  }
+
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
 }
 </style>

@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import type { ClientProfile } from '../../composables/useClients'
 import { formatCurrency, formatDate } from '../../utils/format'
-import NotificationStack from '../ui/NotificationStack.vue'
 
 const props = defineProps<{
   clients: ClientProfile[]
@@ -51,9 +50,6 @@ function displayCreated(client: ClientProfile): string {
         <p class="panel-subtitle">Gestiona datos, reservas y comunicaciones en un solo lugar.</p>
       </div>
       <div class="header-actions">
-        <div class="notifications-slot">
-          <NotificationStack variant="compact" title="Alertas de clientes" countLabel="3 alertas" />
-        </div>
         <span class="pill">Resultados {{ resultCount }}</span>
         <button class="btn-primary" type="button" @click="emit('create')">Crear cliente</button>
       </div>
@@ -80,18 +76,18 @@ function displayCreated(client: ClientProfile): string {
         class="table-row"
         :class="{ active: client.id === props.selectedId }"
       >
-        <button class="link-button" type="button" @click="emit('select', client.id)">
+        <button class="link-button" type="button" data-label="Cliente" @click="emit('select', client.id)">
           <span class="avatar">{{ initialsFor(client) }}</span>
           <span class="client-main">
             <span class="client-name">{{ displayName(client) }}</span>
             <span class="client-meta">{{ client.email ?? 'Sin correo' }}</span>
           </span>
         </button>
-        <span class="client-meta">{{ displayPhone(client) }}</span>
-        <span class="client-metric">{{ client.service_count ?? 0 }}</span>
-        <span class="client-metric">{{ formatCurrency(client.total_sales ?? 0) }}</span>
-        <span class="client-meta">{{ displayCreated(client) }}</span>
-        <div class="row-actions">
+        <span class="client-meta" data-label="Celular">{{ displayPhone(client) }}</span>
+        <span class="client-metric" data-label="# Citas">{{ client.service_count ?? 0 }}</span>
+        <span class="client-metric" data-label="Total ventas">{{ formatCurrency(client.total_sales ?? 0) }}</span>
+        <span class="client-meta" data-label="Creado">{{ displayCreated(client) }}</span>
+        <div class="row-actions" data-label="Acciones">
           <button class="btn-ghost" type="button" @click="emit('edit', client.id)">Editar</button>
           <button
             class="btn-whatsapp"
@@ -296,25 +292,54 @@ function displayCreated(client: ClientProfile): string {
 }
 
 @media (max-width: 760px) {
-  .header-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .search-field {
-    width: 100%;
-  }
-
-  .table {
-    overflow-x: auto;
+  .table-row.table-head {
+    display: none;
   }
 
   .table-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
   }
 
-  .row-actions {
-    justify-content: flex-start;
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .table-row > .link-button {
+    grid-column: 1 / -1;
+  }
+
+  .table-row > .row-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    padding-top: 4px;
+  }
+
+  .link-button {
+    width: 100%;
+  }
+
+  .row-actions > button {
+    min-width: 0;
+    width: auto;
+  }
+
+  .table-row.active {
+    box-shadow: 0 0 0 2px rgba(214, 106, 86, 0.12);
   }
 }
 </style>

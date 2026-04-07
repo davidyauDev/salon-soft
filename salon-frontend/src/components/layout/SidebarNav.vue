@@ -442,7 +442,63 @@ const profileInitials = computed(() =>
     position: relative;
     min-height: auto;
     height: auto;
+    gap: 12px;
+    padding: 12px 12px 10px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .brand-card {
+    padding: 12px;
+  }
+
+  .brand-copy,
+  .nav-copy,
+  .nav-badge,
+  .brand-meta,
+  .profile-copy,
+  .settings {
+    display: none;
+  }
+
+  .nav-block {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin: 0 -2px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-block .section-label {
+    display: none;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+    width: 62px;
+    min-width: 62px;
+    height: 62px;
+    padding: 0;
     grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .nav-item .nav-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .nav-item.active::before {
+    inset: auto auto 6px 50%;
+    width: 18px;
+    height: 3px;
+    transform: translateX(-50%);
+  }
+
+  .sidebar-foot {
+    display: none;
   }
 }
 </style>

@@ -148,11 +148,11 @@ async function clearFilters(): Promise<void> {
           No hay movimientos para estos filtros.
         </div>
         <div v-for="log in audit.logs.value" :key="log.id" class="table-row">
-          <span>{{ formatDateTime(log.created_at) }}</span>
-          <span>{{ log.user?.name ?? 'Sistema' }}</span>
-          <span class="action-pill">{{ actionLabel(log.action) }}</span>
-          <span>{{ entityLabel(log.entity_type) }}</span>
-          <span>#{{ log.entity_id ?? '—' }}</span>
+          <span data-label="Fecha">{{ formatDateTime(log.created_at) }}</span>
+          <span data-label="Usuario">{{ log.user?.name ?? 'Sistema' }}</span>
+          <span class="action-pill" data-label="Accion">{{ actionLabel(log.action) }}</span>
+          <span data-label="Modulo">{{ entityLabel(log.entity_type) }}</span>
+          <span data-label="ID">#{{ log.entity_id ?? '—' }}</span>
           <details class="change-details">
             <summary>Ver cambios</summary>
             <div class="change-grid">
@@ -267,6 +267,42 @@ async function clearFilters(): Promise<void> {
 @media (max-width: 680px) {
   .form-grid.three-col {
     grid-template-columns: 1fr;
+  }
+
+  .table-row.table-head {
+    display: none;
+  }
+
+  .table-row {
+    min-width: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+    border-top: 1px solid rgba(17, 15, 20, 0.06);
+    background: rgba(255, 255, 255, 0.72);
+    border-radius: 16px;
+    margin-top: 10px;
+  }
+
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .change-details {
+    grid-column: 1 / -1;
   }
 }
 </style>

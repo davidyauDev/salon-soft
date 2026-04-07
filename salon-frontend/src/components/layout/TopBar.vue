@@ -180,20 +180,25 @@ const dateLabel = shallowRef(
   .topbar {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
   }
 
   .topbar-actions {
     width: 100%;
     flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
   .headline {
-    font-size: 2rem;
+    font-size: 1.7rem;
+  }
+
+  .date {
+    font-size: 0.82rem;
   }
 
   .alerts-pill {
-    width: 100%;
-    justify-content: center;
+    width: auto;
   }
 
   .user-chip {

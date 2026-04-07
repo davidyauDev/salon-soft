@@ -29,26 +29,26 @@ function formatStock(value: number): string {
     <div v-if="props.loading" class="table-empty">Cargando productos...</div>
     <div v-else-if="props.error" class="table-empty error">{{ props.error }}</div>
     <div v-else-if="!props.items.length" class="table-empty">No hay productos registrados.</div>
-    <div v-else class="table-wrap">
-      <div class="table-row table-head">
-        <span>Nombre</span>
-        <span>Categoria</span>
-        <span>Marca</span>
-        <span>Stock</span>
-        <span>Costo</span>
-        <span>Precio</span>
-        <span class="actions-col">Acciones</span>
-      </div>
-      <div v-for="item in props.items" :key="item.id" class="table-row">
-        <div class="cell-name">
+      <div v-else class="table-wrap">
+        <div class="table-row table-head">
+          <span>Nombre</span>
+          <span>Categoria</span>
+          <span>Marca</span>
+          <span>Stock</span>
+          <span>Costo</span>
+          <span>Precio</span>
+          <span class="actions-col">Acciones</span>
+        </div>
+        <div v-for="item in props.items" :key="item.id" class="table-row">
+        <div class="cell-name" data-label="Nombre">
           <p class="name">{{ item.name }}</p>
         </div>
-        <span class="category-pill">{{ item.category?.name ?? 'Sin categoria' }}</span>
-        <span class="brand-text">{{ item.brand?.name ?? '-' }}</span>
-        <span class="stock-pill">{{ formatStock(item.stock_total) }}</span>
-        <span class="cost">{{ formatCurrency(averageCost(item)) }}</span>
-        <span class="price">{{ formatCurrency(Number(item.sale_price ?? 0)) }}</span>
-        <div class="row-actions">
+        <span class="category-pill" data-label="Categoria">{{ item.category?.name ?? 'Sin categoria' }}</span>
+        <span class="brand-text" data-label="Marca">{{ item.brand?.name ?? '-' }}</span>
+        <span class="stock-pill" data-label="Stock">{{ formatStock(item.stock_total) }}</span>
+          <span class="cost" data-label="Costo">{{ formatCurrency(averageCost(item)) }}</span>
+          <span class="price" data-label="Precio">{{ formatCurrency(Number(item.sale_price ?? 0)) }}</span>
+          <div class="row-actions" data-label="Acciones">
           <button class="icon-btn" type="button" @click="emit('edit', item)" aria-label="Editar">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
@@ -97,11 +97,11 @@ function formatStock(value: number): string {
               />
             </svg>
           </button>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-</template>
+    </section>
+  </template>
 
 <style scoped>
 .products-table {
@@ -237,13 +237,57 @@ function formatStock(value: number): string {
 }
 
 @media (max-width: 840px) {
+  .table-head {
+    display: none;
+  }
+
   .table-row {
-    grid-template-columns: 1.5fr 1fr 0.8fr 0.6fr 0.8fr 0.8fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+    border-radius: 16px;
+    border-top: 1px solid rgba(17, 15, 20, 0.06);
+  }
+
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .cell-name {
+    grid-column: 1 / -1;
+  }
+
+  .cell-name .name {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .category-pill,
+  .stock-pill {
+    width: fit-content;
   }
 
   .row-actions {
     grid-column: 1 / -1;
-    justify-content: flex-start;
+    justify-content: flex-end;
+    padding-top: 4px;
+  }
+
+  .row-actions::before {
+    margin-right: auto;
   }
 }
 </style>

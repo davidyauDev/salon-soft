@@ -26,13 +26,13 @@ const emit = defineEmits<{
         <span class="actions-col"> </span>
       </div>
       <div v-for="row in props.rows" :key="row.id" class="table-row">
-        <span class="id-cell">{{ row.id }}</span>
-        <span>{{ row.client?.full_name ?? 'Sin cliente' }}</span>
-        <div class="chips">
+        <span class="id-cell" data-label="ID de venta">{{ row.id }}</span>
+        <span data-label="Cliente">{{ row.client?.full_name ?? 'Sin cliente' }}</span>
+        <div class="chips" data-label="Servicios">
           <span v-if="row.service?.name" class="chip">{{ row.service.name }}</span>
         </div>
-        <span>{{ formatDate(row.performed_at) }}</span>
-        <span class="amount">{{ formatCurrency(Number(row.total_amount)) }}</span>
+        <span data-label="Fecha">{{ formatDate(row.performed_at) }}</span>
+        <span class="amount" data-label="Monto">{{ formatCurrency(Number(row.total_amount)) }}</span>
         <button class="icon-btn" type="button" aria-label="Detalle" @click="emit('detail', row)">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -126,6 +126,45 @@ const emit = defineEmits<{
 
 .actions-col {
   text-align: right;
+}
+
+@media (max-width: 760px) {
+  .table-head {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+    align-items: start;
+  }
+
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .chips,
+  .icon-btn {
+    grid-column: 1 / -1;
+  }
+
+  .icon-btn {
+    justify-self: end;
+  }
 }
 </style>
 

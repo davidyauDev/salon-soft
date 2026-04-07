@@ -33,16 +33,16 @@ function productCount(row: ServiceRecord): number {
         <span> </span>
       </div>
       <div v-for="row in rows" :key="row.id" class="table-row">
-        <span class="id-cell">{{ row.id }}</span>
-        <span class="status-chip">{{ row.status ?? 'paid' }}</span>
-        <span>{{ row.client?.full_name ?? 'Sin cliente' }}</span>
+        <span class="id-cell" data-label="ID de venta">{{ row.id }}</span>
+        <span class="status-chip" data-label="Estado">{{ row.status ?? 'paid' }}</span>
+        <span data-label="Cliente">{{ row.client?.full_name ?? 'Sin cliente' }}</span>
         <div class="service-cell">
-          <span>{{ row.service?.name ?? 'Sin servicio' }}</span>
+          <span data-label="Servicio">{{ row.service?.name ?? 'Sin servicio' }}</span>
           <small v-if="productCount(row)">+ {{ productCount(row) }} producto(s)</small>
         </div>
-        <span>{{ row.stylist?.user?.name ?? 'Sin staff' }}</span>
-        <span>{{ formatDate(row.performed_at) }}</span>
-        <span class="amount">{{ formatCurrency(Number(row.grand_total ?? row.total_amount)) }}</span>
+        <span data-label="Staff">{{ row.stylist?.user?.name ?? 'Sin staff' }}</span>
+        <span data-label="Fecha">{{ formatDate(row.performed_at) }}</span>
+        <span class="amount" data-label="Monto">{{ formatCurrency(Number(row.grand_total ?? row.total_amount)) }}</span>
         <button class="icon-btn" type="button" aria-label="Detalle" @click="emit('detail', row)">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 7h10v2H7V7Zm0 4h10v2H7v-2Zm0 4h6v2H7v-2Z" />
@@ -134,5 +134,44 @@ function productCount(row: ServiceRecord): number {
   color: var(--ink-muted);
   font-size: 0.95rem;
   text-align: center;
+}
+
+@media (max-width: 760px) {
+  .table-head {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+    align-items: start;
+  }
+
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .service-cell,
+  .icon-btn {
+    grid-column: 1 / -1;
+  }
+
+  .icon-btn {
+    justify-self: end;
+  }
 }
 </style>
