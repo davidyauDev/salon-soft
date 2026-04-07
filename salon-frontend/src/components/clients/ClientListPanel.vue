@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { ClientProfile } from '../../composables/useClients'
 import { formatCurrency, formatDate } from '../../utils/format'
+import NotificationStack from '../ui/NotificationStack.vue'
 
 const props = defineProps<{
   clients: ClientProfile[]
@@ -15,8 +16,6 @@ const emit = defineEmits<{
   (e: 'create'): void
   (e: 'whatsapp', client: ClientProfile): void
 }>()
-
-const search = defineModel<string>({ default: '' })
 
 const resultCount = computed(() => props.clients.length)
 
@@ -52,16 +51,9 @@ function displayCreated(client: ClientProfile): string {
         <p class="panel-subtitle">Gestiona datos, reservas y comunicaciones en un solo lugar.</p>
       </div>
       <div class="header-actions">
-        <label class="search-field">
-          <span class="search-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M10.5 3a7.5 7.5 0 1 0 4.7 13.4l4.2 4.2a1 1 0 0 0 1.4-1.4l-4.2-4.2A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"
-              />
-            </svg>
-          </span>
-          <input v-model="search" class="search-input" type="search" placeholder="Buscar por nombre, correo o numero" />
-        </label>
+        <div class="notifications-slot">
+          <NotificationStack variant="compact" title="Alertas de clientes" countLabel="3 alertas" />
+        </div>
         <span class="pill">Resultados {{ resultCount }}</span>
         <button class="btn-primary" type="button" @click="emit('create')">Crear cliente</button>
       </div>

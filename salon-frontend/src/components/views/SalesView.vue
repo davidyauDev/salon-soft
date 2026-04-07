@@ -18,6 +18,7 @@ import SalesPaymentModal from '../sales/SalesPaymentModal.vue'
 import ClientQuickModal from '../sales/ClientQuickModal.vue'
 import ExpressSaleDrawer from '../sales/ExpressSaleDrawer.vue'
 import ExpressSuccessModal from '../sales/ExpressSuccessModal.vue'
+import NotificationStack from '../ui/NotificationStack.vue'
 
 const catalogs = useCatalogs()
 const sales = useSales()
@@ -26,7 +27,6 @@ const expressSales = useExpressSales()
 const clientsStore = useClients()
 
 const activeTab = shallowRef<'appointments' | 'express' | 'products'>('express')
-const search = shallowRef('')
 const fromDate = shallowRef('2026-03-06')
 const toDate = shallowRef('2026-04-05')
 const itemsPerPage = shallowRef(20)
@@ -71,12 +71,6 @@ onMounted(() => {
   expressSales.load()
 })
 
-const searchPlaceholder = computed(() => {
-  if (activeTab.value === 'appointments') return 'Buscar por cliente o servicio'
-  if (activeTab.value === 'express') return 'Buscar por cliente o servicio'
-  return 'Buscar por cliente o producto'
-})
-
 function inRange(value: string): boolean {
   if (!value) return true
   const current = new Date(value)
@@ -102,47 +96,9 @@ const productRows = computed(() =>
   sales.sales.value.filter((sale) => inRange(sale.sold_at)),
 )
 
-const filteredAppointments = computed(() => {
-  const query = search.value.trim().toLowerCase()
-  if (!query) return appointmentRows.value
-
-  return appointmentRows.value.filter((record) => {
-    const client = record.client?.full_name?.toLowerCase() ?? ''
-    const service = record.service?.name?.toLowerCase() ?? ''
-    return client.includes(query) || service.includes(query)
-  })
-})
-
-const filteredExpress = computed(() => {
-  const query = search.value.trim().toLowerCase()
-  if (!query) return expressRows.value
-
-  return expressRows.value.filter((record) => {
-    const client = record.client?.full_name?.toLowerCase() ?? ''
-    const service = record.service?.name?.toLowerCase() ?? ''
-    const products = (record.sale?.items ?? [])
-      .map((line) => line.item?.name?.toLowerCase() ?? '')
-      .join(' ')
-    return client.includes(query) || service.includes(query) || products.includes(query)
-  })
-})
-
-const filteredProducts = computed(() => {
-  const query = search.value.trim().toLowerCase()
-  if (!query) return productRows.value
-
-  return productRows.value.filter((sale) => {
-    const client = sale.client?.full_name?.toLowerCase() ?? ''
-    const products = (sale.items ?? [])
-      .map((line) => line.item?.name?.toLowerCase() ?? '')
-      .join(' ')
-    return client.includes(query) || products.includes(query)
-  })
-})
-
-const pagedAppointments = computed(() => filteredAppointments.value.slice(0, itemsPerPage.value))
-const pagedExpress = computed(() => filteredExpress.value.slice(0, itemsPerPage.value))
-const pagedProducts = computed(() => filteredProducts.value.slice(0, itemsPerPage.value))
+const pagedAppointments = computed(() => appointmentRows.value.slice(0, itemsPerPage.value))
+const pagedExpress = computed(() => expressRows.value.slice(0, itemsPerPage.value))
+const pagedProducts = computed(() => productRows.value.slice(0, itemsPerPage.value))
 
 const paymentClient = computed(() => {
   if (!pendingSale.value?.client_id) return null
@@ -155,9 +111,9 @@ const paymentTotal = computed(() => {
 })
 
 const activeCount = computed(() => {
-  if (activeTab.value === 'appointments') return filteredAppointments.value.length
-  if (activeTab.value === 'express') return filteredExpress.value.length
-  return filteredProducts.value.length
+  if (activeTab.value === 'appointments') return appointmentRows.value.length
+  if (activeTab.value === 'express') return expressRows.value.length
+  return productRows.value.length
 })
 
 const summaryCards = computed(() => {
@@ -408,14 +364,12 @@ function closeClientModal(): void {
     </div>
 
     <div class="filters">
-      <label class="search-field">
-        <input v-model="search" type="search" :placeholder="searchPlaceholder" />
-        <span class="search-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M10.5 3a7.5 7.5 0 1 0 4.7 13.4l4.2 4.2a1 1 0 0 0 1.4-1.4l-4.2-4.2A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z" />
-          </svg>
-        </span>
-      </label>
+      <NotificationStack
+        class="filters-notifications"
+        variant="compact"
+        title="Alertas de ventas"
+        countLabel="3 avisos"
+      />
 
       <div class="range-picker">
         <input v-model="fromDate" type="date" />
@@ -653,34 +607,12 @@ function closeClientModal(): void {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.search-field {
-  position: relative;
-  width: min(392px, 100%);
-}
-
-.search-field input {
-  width: 100%;
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  border-radius: 12px;
-  padding: 11px 42px 11px 14px;
-  font-size: 0.95rem;
-}
-
-.search-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #2d3748;
-}
-
-.search-icon svg {
-  width: 18px;
-  height: 18px;
-  fill: currentColor;
+.filters-notifications {
+  width: min(100%, 420px);
 }
 
 .range-picker {
@@ -734,6 +666,7 @@ function closeClientModal(): void {
     justify-content: space-between;
   }
 
+  .filters-notifications,
   .range-picker {
     width: 100%;
   }

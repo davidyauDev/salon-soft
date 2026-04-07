@@ -2,6 +2,7 @@
 import { computed, shallowRef } from 'vue'
 import type { ServiceCategory, ServiceItem } from '../../composables/useServiceCatalog'
 import { formatCurrency } from '../../utils/format'
+import NotificationStack from '../ui/NotificationStack.vue'
 
 const props = defineProps<{
   categories: ServiceCategory[]
@@ -19,25 +20,16 @@ const emit = defineEmits<{
   (e: 'move-service', payload: { service: ServiceItem; direction: 'up' | 'down' }): void
 }>()
 
-const search = defineModel<string>('search', { default: '' })
 const selectedCategoryId = defineModel<number | null>('selectedCategoryId', { default: null })
 const expandedSectionKeys = shallowRef<string[]>([])
-
-const normalizedQuery = computed(() => search.value.trim().toLowerCase())
 
 const orderedCategories = computed(() =>
   [...props.categories].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name)),
 )
 
-const filteredServices = computed(() => {
-  if (!normalizedQuery.value) return props.services
-  return props.services.filter((service) => {
-    const name = service.name?.toLowerCase() ?? ''
-    return name.includes(normalizedQuery.value)
-  })
-})
+const filteredServices = computed(() => props.services)
 
-const countSource = computed(() => (normalizedQuery.value ? filteredServices.value : props.services))
+const countSource = computed(() => props.services)
 
 const servicesByCategory = computed(() => {
   const map = new Map<number | null, ServiceItem[]>()
@@ -65,7 +57,7 @@ const categoryCounts = computed(() => {
 })
 
 const totalCount = computed(() => countSource.value.length)
-const isAccordionMode = computed(() => selectedCategoryId.value === null && !normalizedQuery.value)
+const isAccordionMode = computed(() => selectedCategoryId.value === null)
 
 const visibleSections = computed(() => {
   const sections: Array<{ category: ServiceCategory | null; services: ServiceItem[] }> = []
@@ -141,16 +133,9 @@ function showAllCategories(): void {
         <p class="panel-subtitle">Configura duraciones, precios y personal asignado.</p>
       </div>
       <div class="header-actions">
-        <label class="search-field">
-          <span class="search-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M10.5 3a7.5 7.5 0 1 0 4.7 13.4l4.2 4.2a1 1 0 0 0 1.4-1.4l-4.2-4.2A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"
-              />
-            </svg>
-          </span>
-          <input v-model="search" class="search-input" type="search" placeholder="Buscar por nombre de servicio..." />
-        </label>
+        <div class="notifications-slot">
+          <NotificationStack variant="compact" title="Alertas del catálogo" countLabel="3 avisos" />
+        </div>
         <span class="pill">Servicios {{ totalCount }}</span>
         <button class="btn-ghost" type="button">Ver sitio web</button>
       </div>

@@ -14,7 +14,6 @@ import CategoryManageModal from '../products/CategoryManageModal.vue'
 const products = useProducts()
 const catalogs = useInventoryCatalogs()
 
-const search = shallowRef('')
 const itemsPerPage = shallowRef(100)
 
 const showProductModal = shallowRef(false)
@@ -32,17 +31,7 @@ onMounted(() => {
   catalogs.load()
 })
 
-const filteredProducts = computed(() => {
-  const query = search.value.trim().toLowerCase()
-  if (!query) return products.items.value
-  return products.items.value.filter((item) => {
-    const name = item.name?.toLowerCase() ?? ''
-    const brand = item.brand?.name?.toLowerCase() ?? ''
-    return name.includes(query) || brand.includes(query)
-  })
-})
-
-const pagedProducts = computed(() => filteredProducts.value.slice(0, itemsPerPage.value))
+const pagedProducts = computed(() => products.items.value.slice(0, itemsPerPage.value))
 
 function openCreateProduct(): void {
   editingProduct.value = null
@@ -262,19 +251,6 @@ function editCategory(category: InventoryCategory): void {
       </div>
     </header>
 
-    <div class="search-row">
-      <label class="search-field">
-        <span class="search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M10.5 3a7.5 7.5 0 1 0 4.7 13.4l4.2 4.2a1 1 0 0 0 1.4-1.4l-4.2-4.2A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z"
-            />
-          </svg>
-        </span>
-        <input v-model="search" type="search" placeholder="Buscar por nombre de producto..." />
-      </label>
-    </div>
-
     <ProductTable
       :items="pagedProducts"
       :loading="products.loading.value"
@@ -343,7 +319,7 @@ function editCategory(category: InventoryCategory): void {
 
 .subtitle {
   margin: 6px 0 0;
-  color: #6f6770;
+  color: #6f6963;
 }
 
 .header-actions {
@@ -355,56 +331,20 @@ function editCategory(category: InventoryCategory): void {
   padding: 10px 16px;
   border-radius: 12px;
   border: none;
-  background: #5a4bff;
+  background: #111111;
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 10px 20px rgba(17, 17, 17, 0.14);
 }
 
 .btn-ghost {
   padding: 10px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #fff;
-  font-weight: 600;
+  border: 1px solid rgba(25, 25, 25, 0.12);
+  background: #fffdfb;
+  font-weight: 700;
   cursor: pointer;
-}
-
-.search-row {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.search-field {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  border-radius: 12px;
-  background: #fff;
-  min-width: 320px;
-}
-
-.search-field input {
-  border: none;
-  outline: none;
-  font-size: 0.95rem;
-  width: 100%;
-}
-
-.search-icon {
-  width: 16px;
-  height: 16px;
-  display: grid;
-  place-items: center;
-  color: #6f6770;
-}
-
-.search-icon svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
 }
 
 .table-footer {
@@ -412,15 +352,15 @@ function editCategory(category: InventoryCategory): void {
   justify-content: flex-end;
   align-items: center;
   gap: 10px;
-  color: #6f6770;
+  color: #6f6963;
   font-size: 0.85rem;
 }
 
 .table-footer select {
-  border: 1px solid rgba(17, 15, 20, 0.18);
+  border: 1px solid rgba(25, 25, 25, 0.12);
   border-radius: 10px;
   padding: 6px 12px;
-  background: #fff;
+  background: #fffdfb;
 }
 
 @media (max-width: 900px) {
@@ -433,11 +373,6 @@ function editCategory(category: InventoryCategory): void {
     width: 100%;
     justify-content: flex-start;
     flex-wrap: wrap;
-  }
-
-  .search-field {
-    width: 100%;
-    min-width: auto;
   }
 }
 </style>

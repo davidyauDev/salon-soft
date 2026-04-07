@@ -343,8 +343,8 @@ function handleSubmit(): void {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(90, 75, 255, 0.18);
-  border-top-color: #5a4bff;
+  border: 2px solid rgba(15, 118, 110, 0.18);
+  border-top-color: var(--accent);
   animation: spin 0.8s linear infinite;
 }
 
@@ -399,7 +399,7 @@ function handleSubmit(): void {
   height: 38px;
   border-radius: 12px;
   border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #f2f3f7;
+  background: #edf8f6;
   font-weight: 700;
   cursor: pointer;
 }
@@ -428,7 +428,7 @@ function handleSubmit(): void {
   padding: 10px 18px;
   border-radius: 12px;
   border: none;
-  background: #5a4bff;
+  background: var(--accent-strong);
   color: #fff;
   font-weight: 600;
   cursor: pointer;

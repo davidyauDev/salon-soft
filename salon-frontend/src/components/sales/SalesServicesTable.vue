@@ -47,9 +47,9 @@ const emit = defineEmits<{
 
 <style scoped>
 .table-card {
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  border-radius: 14px;
-  background: #fff;
+  border: 1px solid rgba(25, 25, 25, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 253, 251, 0.92);
   overflow: hidden;
 }
 
@@ -63,12 +63,12 @@ const emit = defineEmits<{
   gap: 16px;
   align-items: center;
   padding: 14px 18px;
-  border-top: 1px solid rgba(17, 15, 20, 0.06);
+  border-top: 1px solid rgba(25, 25, 25, 0.06);
   font-size: 0.92rem;
 }
 
 .table-head {
-  background: #f6f7f9;
+  background: #f4efe7;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -77,7 +77,7 @@ const emit = defineEmits<{
 }
 
 .id-cell {
-  color: #5a4bff;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -94,8 +94,8 @@ const emit = defineEmits<{
 .chip {
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(90, 75, 255, 0.08);
-  color: #4f46e5;
+  background: var(--accent-soft);
+  color: #0b534b;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -105,7 +105,7 @@ const emit = defineEmits<{
   height: 32px;
   border-radius: 8px;
   border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #fff;
+  background: #fffdfa;
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -114,12 +114,12 @@ const emit = defineEmits<{
 .icon-btn svg {
   width: 16px;
   height: 16px;
-  fill: #6f6770;
+  fill: var(--ink-muted);
 }
 
 .table-empty {
   padding: 18px;
-  color: #6f6770;
+  color: var(--ink-muted);
   font-size: 0.9rem;
   text-align: center;
 }

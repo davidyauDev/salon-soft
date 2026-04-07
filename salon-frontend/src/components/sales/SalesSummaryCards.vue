@@ -51,26 +51,27 @@ defineProps<{
 }
 
 .summary-card {
-  border: 1px solid rgba(18, 18, 23, 0.1);
-  border-radius: 16px;
-  background: #fff;
+  border: 1px solid rgba(25, 25, 25, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 253, 251, 0.92);
   padding: 16px 18px;
   display: grid;
   gap: 10px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
 }
 
 .summary-head {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #63708a;
+  color: var(--ink-muted);
   font-size: 0.98rem;
 }
 
 .summary-icon {
   width: 18px;
   height: 18px;
-  color: #6d7891;
+  color: var(--accent);
 }
 
 .summary-icon svg {
@@ -80,7 +81,7 @@ defineProps<{
 }
 
 .summary-value {
-  color: #1d2940;
+  color: var(--ink-strong);
   font-size: 1.12rem;
   font-weight: 800;
 }

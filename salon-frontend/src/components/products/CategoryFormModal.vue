@@ -135,8 +135,8 @@ function handleSubmit(): void {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(90, 75, 255, 0.18);
-  border-top-color: #5a4bff;
+  border: 2px solid rgba(15, 118, 110, 0.18);
+  border-top-color: var(--accent);
   animation: spin 0.8s linear infinite;
 }
 
@@ -215,7 +215,7 @@ function handleSubmit(): void {
   padding: 10px 18px;
   border-radius: 12px;
   border: none;
-  background: #8d84ff;
+  background: var(--accent-strong);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
