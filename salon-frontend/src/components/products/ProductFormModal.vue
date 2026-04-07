@@ -53,7 +53,7 @@ function averageCost(item: ProductItem | null | undefined): string {
 }
 
 watch(
-  () => [props.open, props.initial],
+  () => [props.open, props.initial] as const,
   ([open, initial]) => {
     if (!open) return
     form.name = initial?.name ?? ''

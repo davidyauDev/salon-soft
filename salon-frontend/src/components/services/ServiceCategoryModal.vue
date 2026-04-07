@@ -21,7 +21,7 @@ const form = reactive({
 const isEditing = computed(() => Boolean(props.initial))
 
 watch(
-  () => [props.open, props.initial],
+  () => [props.open, props.initial] as const,
   ([open, initial]) => {
     if (open) {
       form.name = initial?.name ?? ''

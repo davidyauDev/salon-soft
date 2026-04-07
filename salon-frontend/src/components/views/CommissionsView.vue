@@ -22,7 +22,11 @@ onMounted(() => {
     <section class="panel">
       <h3>Totales del periodo</h3>
       <div class="summary-grid">
-        <div v-for="row in commissions.summary.value" :key="row.stylist" class="summary-card">
+        <div
+          v-for="(row, index) in commissions.summary.value"
+          :key="row.stylist ?? index"
+          class="summary-card"
+        >
           <p class="summary-name">{{ row.stylist ?? 'Estilista' }}</p>
           <p class="summary-total">{{ formatCurrency(row.total) }}</p>
         </div>

@@ -46,7 +46,7 @@ const form = reactive({
 const isEditing = computed(() => Boolean(props.initial))
 
 watch(
-  () => [props.open, props.initial, props.initialCategoryId],
+  () => [props.open, props.initial, props.initialCategoryId] as const,
   ([open, initial, initialCategoryId]) => {
     if (!open) {
       form.category_id = ''
@@ -71,8 +71,8 @@ watch(
       form.requires_deposit = Boolean(initial.requires_deposit)
       form.deposit_amount = initial.deposit_amount != null ? String(initial.deposit_amount) : ''
       form.is_active = initial.is_active ?? true
-      form.location_ids = (initial.locations ?? []).map((location) => location.id)
-      form.stylist_ids = (initial.stylists ?? []).map((stylist) => stylist.id)
+      form.location_ids = (initial.locations ?? []).map((location: ServiceLocation) => location.id)
+      form.stylist_ids = (initial.stylists ?? []).map((stylist: ServiceStylist) => stylist.id)
       return
     }
 

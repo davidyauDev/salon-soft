@@ -19,7 +19,7 @@ const error = reactive({ name: '' })
 const isEditing = computed(() => Boolean(props.initial))
 
 watch(
-  () => [props.open, props.initial],
+  () => [props.open, props.initial] as const,
   ([open, initial]) => {
     if (!open) return
     form.name = initial?.name ?? ''
