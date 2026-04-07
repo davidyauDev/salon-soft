@@ -147,8 +147,8 @@ function handleSubmit(): void {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(90, 75, 255, 0.18);
-  border-top-color: #5a4bff;
+  border: 2px solid rgba(15, 118, 110, 0.18);
+  border-top-color: var(--accent);
   animation: spin 0.8s linear infinite;
 }
 
@@ -161,7 +161,7 @@ function handleSubmit(): void {
 
 .close-button {
   border: none;
-  background: rgba(17, 15, 20, 0.08);
+  background: rgba(25, 25, 25, 0.08);
   width: 36px;
   height: 36px;
   border-radius: 12px;

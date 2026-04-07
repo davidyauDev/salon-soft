@@ -30,18 +30,24 @@ interface DashboardResponse {
 
 const loading = shallowRef(false)
 const data = shallowRef<DashboardResponse | null>(null)
+const error = shallowRef<string | null>(null)
 
 export function useDashboard() {
   async function load(): Promise<void> {
     loading.value = true
+    error.value = null
     try {
       data.value = await apiFetch<DashboardResponse>('/api/dashboard')
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'No se pudo cargar el dashboard.'
+      data.value = null
     } finally {
       loading.value = false
     }
   }
 
   return {
+    error,
     loading,
     data,
     load,

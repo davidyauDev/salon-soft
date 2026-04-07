@@ -222,7 +222,7 @@ select {
 .more-btn {
   border: none;
   background: transparent;
-  color: #5a4bff;
+  color: var(--accent);
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -242,20 +242,20 @@ select {
 }
 
 .btn-primary {
-  background: #5a4bff;
+  background: #111111;
   color: #fff;
   border: none;
   border-radius: 12px;
   padding: 10px 18px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .btn-ghost {
-  background: #fff;
-  border: 1px solid rgba(17, 15, 20, 0.12);
+  background: #fffdfb;
+  border: 1px solid rgba(25, 25, 25, 0.12);
   border-radius: 12px;
   padding: 10px 18px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 @media (max-width: 600px) {

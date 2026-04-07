@@ -126,7 +126,7 @@ function formatStock(value: number): string {
 }
 
 .table-head {
-  background: #f6f7f9;
+  background: #f4efe7;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -145,15 +145,15 @@ function formatStock(value: number): string {
   justify-content: center;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(120, 112, 250, 0.12);
-  color: #4f46e5;
+  background: rgba(15, 118, 110, 0.12);
+  color: #0b534b;
   font-size: 0.8rem;
   font-weight: 600;
   width: fit-content;
 }
 
 .brand-text {
-  color: #4a4a57;
+  color: var(--ink-muted);
 }
 
 .stock-pill {
@@ -163,7 +163,7 @@ function formatStock(value: number): string {
   width: 40px;
   height: 24px;
   border-radius: 999px;
-  background: #5a4bff;
+  background: #111111;
   color: #fff;
   font-weight: 700;
   font-size: 0.8rem;
@@ -197,7 +197,7 @@ function formatStock(value: number): string {
   display: grid;
   place-items: center;
   cursor: pointer;
-  color: #1f1d29;
+  color: var(--ink-strong);
   transition:
     color 0.18s ease,
     opacity 0.18s ease,
@@ -211,7 +211,7 @@ function formatStock(value: number): string {
 }
 
 .icon-btn.danger {
-  color: #ff2f6d;
+  color: #0b534b;
 }
 
 .icon-btn:hover {
@@ -221,12 +221,12 @@ function formatStock(value: number): string {
 
 .table-empty {
   padding: 18px;
-  color: #6f6770;
+  color: var(--ink-muted);
   font-size: 0.9rem;
 }
 
 .table-empty.error {
-  color: #b24b3a;
+  color: #8a3b37;
 }
 
 @media (max-width: 1000px) {

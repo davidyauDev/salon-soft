@@ -9,7 +9,6 @@ import ServiceFormModal from '../services/ServiceFormModal.vue'
 
 const catalog = useServiceCatalog()
 
-const search = shallowRef('')
 const selectedCategoryId = shallowRef<number | null>(null)
 
 const showCategoryModal = shallowRef(false)
@@ -156,7 +155,6 @@ async function moveService(payload: { service: ServiceItem; direction: 'up' | 'd
     </header>
 
     <ServiceCatalogPanel
-      v-model:search="search"
       v-model:selectedCategoryId="selectedCategoryId"
       :categories="catalog.categories.value"
       :services="catalog.services.value"

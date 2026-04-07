@@ -153,7 +153,7 @@ function handlePay(): void {
 }
 
 .payment-box {
-  border: 1px solid rgba(17, 15, 20, 0.08);
+  border: 1px solid rgba(25, 25, 25, 0.08);
   border-radius: 12px;
   padding: 12px 14px;
   display: grid;
@@ -162,7 +162,7 @@ function handlePay(): void {
 
 .box-title {
   font-size: 0.8rem;
-  color: #6f6770;
+  color: #6f6963;
 }
 
 .chip-group {
@@ -174,17 +174,17 @@ function handlePay(): void {
 .chip {
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #f6f7f9;
+  border: 1px solid rgba(25, 25, 25, 0.12);
+  background: #fffdfb;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.85rem;
 }
 
 .chip.active {
-  background: #5a4bff;
+  background: #111111;
   color: #fff;
-  border-color: #5a4bff;
+  border-color: #111111;
 }
 
 .toggle-row {
@@ -210,7 +210,7 @@ function handlePay(): void {
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background: #d6d6e0;
+  background: #ded8d2;
   transition: 0.2s;
   border-radius: 999px;
 }
@@ -228,7 +228,7 @@ function handlePay(): void {
 }
 
 .switch input:checked + .slider {
-  background: #5a4bff;
+  background: var(--accent);
 }
 
 .switch input:checked + .slider:before {
@@ -241,7 +241,7 @@ function handlePay(): void {
 }
 
 .total-card {
-  border: 1px solid rgba(17, 15, 20, 0.1);
+  border: 1px solid rgba(25, 25, 25, 0.08);
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
@@ -250,11 +250,11 @@ function handlePay(): void {
 }
 
 .btn-primary {
-  background: #5a4bff;
+  background: #111111;
   color: #fff;
   border: none;
   border-radius: 12px;
   padding: 12px 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 </style>

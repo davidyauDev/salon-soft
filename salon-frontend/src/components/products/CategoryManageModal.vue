@@ -159,8 +159,8 @@ function requestClose(): void {
   width: fit-content;
   padding: 10px 14px;
   border-radius: 999px;
-  background: rgba(90, 75, 255, 0.08);
-  color: #4f46e5;
+  background: rgba(15, 118, 110, 0.1);
+  color: #0b534b;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -169,8 +169,8 @@ function requestClose(): void {
   width: 14px;
   height: 14px;
   border-radius: 999px;
-  border: 2px solid rgba(90, 75, 255, 0.18);
-  border-top-color: #5a4bff;
+  border: 2px solid rgba(15, 118, 110, 0.18);
+  border-top-color: var(--accent);
   animation: spin 0.8s linear infinite;
 }
 
@@ -191,7 +191,7 @@ function requestClose(): void {
   height: 36px;
   border-radius: 12px;
   border: none;
-  background: #5a4bff;
+  background: #111111;
   color: #fff;
   font-weight: 700;
   cursor: pointer;
@@ -199,7 +199,7 @@ function requestClose(): void {
 
 .close-button {
   border: none;
-  background: rgba(17, 15, 20, 0.08);
+  background: rgba(25, 25, 25, 0.08);
   width: 36px;
   height: 36px;
   border-radius: 12px;
@@ -216,7 +216,7 @@ function requestClose(): void {
 }
 
 .table {
-  border: 1px solid rgba(17, 15, 20, 0.12);
+  border: 1px solid rgba(25, 25, 25, 0.12);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -230,7 +230,7 @@ function requestClose(): void {
 }
 
 .table-head {
-  background: #f6f7f9;
+  background: #f4efe7;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -238,7 +238,7 @@ function requestClose(): void {
 }
 
 .table-row {
-  border-top: 1px solid rgba(17, 15, 20, 0.08);
+  border-top: 1px solid rgba(25, 25, 25, 0.08);
   font-size: 0.9rem;
 }
 
@@ -262,7 +262,7 @@ function requestClose(): void {
   display: grid;
   place-items: center;
   cursor: pointer;
-  color: #1f1d29;
+  color: var(--ink-strong);
   transition:
     color 0.18s ease,
     opacity 0.18s ease,
@@ -276,7 +276,7 @@ function requestClose(): void {
 }
 
 .icon-btn.danger {
-  color: #ff2f6d;
+  color: #0b534b;
 }
 
 .icon-btn:hover {

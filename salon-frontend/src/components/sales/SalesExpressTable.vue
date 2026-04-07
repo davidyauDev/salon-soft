@@ -55,9 +55,9 @@ function productCount(row: ServiceRecord): number {
 
 <style scoped>
 .table-card {
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  border-radius: 14px;
-  background: #fff;
+  border: 1px solid rgba(25, 25, 25, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 253, 251, 0.92);
   overflow: hidden;
 }
 
@@ -71,24 +71,24 @@ function productCount(row: ServiceRecord): number {
   gap: 16px;
   align-items: center;
   padding: 14px 18px;
-  border-top: 1px solid rgba(17, 15, 20, 0.06);
+  border-top: 1px solid rgba(25, 25, 25, 0.06);
   font-size: 0.92rem;
 }
 
 .table-head {
-  background: #f6f8fc;
+  background: #f4efe7;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
-  color: #6a7387;
+  color: var(--ink-muted);
   border-top: none;
 }
 
 .id-cell,
 .amount {
   font-weight: 700;
-  color: #20304a;
+  color: var(--ink-strong);
 }
 
 .service-cell {
@@ -97,7 +97,7 @@ function productCount(row: ServiceRecord): number {
 }
 
 .service-cell small {
-  color: #6f7a8e;
+  color: var(--ink-muted);
   font-size: 0.76rem;
 }
 
@@ -105,8 +105,8 @@ function productCount(row: ServiceRecord): number {
   width: fit-content;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(90, 75, 255, 0.08);
-  color: #4f46e5;
+  background: var(--accent-soft);
+  color: #0b534b;
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: capitalize;
@@ -117,7 +117,7 @@ function productCount(row: ServiceRecord): number {
   height: 34px;
   border-radius: 10px;
   border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #fff;
+  background: #fffdfa;
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -126,12 +126,12 @@ function productCount(row: ServiceRecord): number {
 .icon-btn svg {
   width: 16px;
   height: 16px;
-  fill: #6f6770;
+  fill: var(--ink-muted);
 }
 
 .table-empty {
   padding: 48px 18px;
-  color: #97a1b2;
+  color: var(--ink-muted);
   font-size: 0.95rem;
   text-align: center;
 }

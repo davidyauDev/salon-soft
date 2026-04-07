@@ -11,7 +11,6 @@ const clients = useClients()
 
 const selectedId = shallowRef<number | null>(null)
 const editingId = shallowRef<number | null>(null)
-const search = shallowRef('')
 const showForm = shallowRef(false)
 const showDetail = shallowRef(false)
 const saving = shallowRef(false)
@@ -20,16 +19,7 @@ const formSeed = shallowRef<ClientFormState>(createEmptyForm())
 const whatsappMessage =
   'Hola {{name}}, te escribimos desde Salon Control. Quieres agendar tu proxima cita?'
 
-const filteredClients = computed(() => {
-  const query = search.value.trim().toLowerCase()
-  if (!query) return clients.clients.value
-  return clients.clients.value.filter((client) => {
-    const name = client.full_name?.toLowerCase() ?? ''
-    const email = client.email?.toLowerCase() ?? ''
-    const phone = client.phone?.toLowerCase() ?? ''
-    return name.includes(query) || email.includes(query) || phone.includes(query)
-  })
-})
+const filteredClients = computed(() => clients.clients.value)
 
 const selectedClient = computed(() => {
   if (!selectedId.value) return null
@@ -220,7 +210,6 @@ function openWhatsApp(client: ClientProfile): void {
     </header>
 
     <ClientListPanel
-      v-model="search"
       :clients="filteredClients"
       :selected-id="selectedId"
       @create="openCreate"

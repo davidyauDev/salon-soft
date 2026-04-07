@@ -395,7 +395,7 @@ function clearClient(): void {
   gap: 10px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: #f3f4f7;
+  background: #f4efe7;
   border: none;
   font-weight: 600;
   cursor: pointer;
@@ -406,7 +406,7 @@ function clearClient(): void {
   height: 40px;
   border-radius: 12px;
   border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #eef0ff;
+  background: var(--accent-soft);
   display: grid;
   place-items: center;
 }
@@ -414,7 +414,7 @@ function clearClient(): void {
 .icon-btn svg {
   width: 18px;
   height: 18px;
-  fill: #5a4bff;
+  fill: var(--accent);
 }
 
 .client-card {
@@ -456,7 +456,7 @@ function clearClient(): void {
 .link-btn {
   border: none;
   background: transparent;
-  color: #5a4bff;
+  color: var(--accent);
   cursor: pointer;
   font-weight: 600;
 }
@@ -507,7 +507,7 @@ function clearClient(): void {
 
 .total {
   font-weight: 700;
-  color: #10b981;
+  color: var(--accent);
 }
 
 .drawer-footer {
@@ -532,7 +532,7 @@ function clearClient(): void {
 }
 
 .btn-primary {
-  background: #5a4bff;
+  background: var(--accent-strong);
   color: #fff;
   border: none;
   border-radius: 12px;

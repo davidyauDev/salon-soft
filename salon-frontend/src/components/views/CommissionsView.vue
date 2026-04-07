@@ -66,10 +66,11 @@ onMounted(() => {
 }
 
 .summary-card {
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
+  background: rgba(255, 253, 251, 0.92);
+  border-radius: 18px;
   padding: 14px;
-  border: 1px solid rgba(17, 15, 20, 0.05);
+  border: 1px solid rgba(25, 25, 25, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.78) inset;
 }
 
 .summary-name {
@@ -81,7 +82,8 @@ onMounted(() => {
 .summary-total {
   margin: 6px 0 0;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--ink-strong);
 }
 
 .table-row {
