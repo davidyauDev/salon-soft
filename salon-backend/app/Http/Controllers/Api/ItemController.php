@@ -60,7 +60,7 @@ class ItemController extends Controller
             || $item->serviceConsumptions()->exists()
         ) {
             return response()->json([
-                'message' => 'Item has inventory history and cannot be deleted.',
+                'message' => 'No se puede eliminar este producto porque tiene historial de inventario o movimientos registrados.',
             ], 422);
         }
 

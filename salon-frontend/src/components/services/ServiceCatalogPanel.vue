@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, shallowRef } from 'vue'
 import type { ServiceCategory, ServiceItem } from '../../composables/useServiceCatalog'
 import { formatCurrency } from '../../utils/format'
 
@@ -21,6 +21,7 @@ const emit = defineEmits<{
 
 const search = defineModel<string>('search', { default: '' })
 const selectedCategoryId = defineModel<number | null>('selectedCategoryId', { default: null })
+const expandedSectionKeys = shallowRef<string[]>([])
 
 const normalizedQuery = computed(() => search.value.trim().toLowerCase())
 
@@ -64,6 +65,7 @@ const categoryCounts = computed(() => {
 })
 
 const totalCount = computed(() => countSource.value.length)
+const isAccordionMode = computed(() => selectedCategoryId.value === null && !normalizedQuery.value)
 
 const visibleSections = computed(() => {
   const sections: Array<{ category: ServiceCategory | null; services: ServiceItem[] }> = []
@@ -105,6 +107,29 @@ function categoryLabel(category: ServiceCategory | null): string {
 function categoryCount(categoryId: number | null): number {
   return categoryCounts.value.get(categoryId ?? null) ?? 0
 }
+
+function sectionKey(category: ServiceCategory | null): string {
+  return category ? `category-${category.id}` : 'category-uncategorized'
+}
+
+function isSectionExpanded(category: ServiceCategory | null): boolean {
+  if (!isAccordionMode.value) return true
+  return expandedSectionKeys.value.includes(sectionKey(category))
+}
+
+function toggleSection(category: ServiceCategory | null): void {
+  if (!isAccordionMode.value) return
+
+  const key = sectionKey(category)
+  expandedSectionKeys.value = expandedSectionKeys.value.includes(key)
+    ? expandedSectionKeys.value.filter((item) => item !== key)
+    : [...expandedSectionKeys.value, key]
+}
+
+function showAllCategories(): void {
+  selectedCategoryId.value = null
+  expandedSectionKeys.value = []
+}
 </script>
 
 <template>
@@ -143,7 +168,7 @@ function categoryCount(categoryId: number | null): number {
           class="category-pill"
           :class="{ active: selectedCategoryId === null }"
           type="button"
-          @click="selectedCategoryId = null"
+          @click="showAllCategories"
         >
           <span>Todas las categorias</span>
           <span class="count">{{ totalCount }}</span>
@@ -172,71 +197,251 @@ function categoryCount(categoryId: number | null): number {
         </div>
 
         <div v-else class="category-list">
-          <section v-for="section in visibleSections" :key="section.category?.id ?? 'uncat'" class="category-card">
+          <section
+            v-for="section in visibleSections"
+            :key="section.category?.id ?? 'uncat'"
+            class="category-card"
+            :class="{ collapsed: isAccordionMode && !isSectionExpanded(section.category) }"
+          >
             <header class="category-header">
-              <div class="category-title">
+              <button
+                class="category-toggle"
+                type="button"
+                :class="{ collapsible: isAccordionMode }"
+                @click="toggleSection(section.category)"
+              >
+                <span class="category-chevron" :class="{ expanded: isSectionExpanded(section.category) }" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M6 9l6 6 6-6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
                 <h4>{{ categoryLabel(section.category) }}</h4>
                 <span class="pill">{{ section.services.length }} servicios</span>
-              </div>
+              </button>
               <div class="category-actions">
                 <button
-                  class="btn-ghost"
+                  class="service-add-btn"
                   type="button"
-                  @click="emit('create-service', section.category?.id ?? null)"
+                  @click.stop="emit('create-service', section.category?.id ?? null)"
                 >
-                  + Servicio
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M12 5v14M5 12h14"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.9"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                  <span>Servicio</span>
                 </button>
                 <template v-if="section.category">
-                  <button class="icon-btn" type="button" @click="emit('edit-category', section.category)">
-                    Editar
+                  <button
+                    class="header-icon-btn"
+                    type="button"
+                    title="Editar categoria"
+                    @click.stop="emit('edit-category', section.category)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M12 20h9"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
                   </button>
-                  <button class="icon-btn danger" type="button" @click="emit('delete-category', section.category)">
-                    Eliminar
+                  <button
+                    class="header-icon-btn danger"
+                    type="button"
+                    title="Eliminar categoria"
+                    @click.stop="emit('delete-category', section.category)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M3 6h18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                      />
+                      <path
+                        d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M19 6l-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M10 11v6M14 11v6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                      />
+                    </svg>
                   </button>
                 </template>
               </div>
             </header>
 
-            <div v-if="!section.services.length" class="empty-row">
+            <div v-if="isSectionExpanded(section.category) && !section.services.length" class="empty-row">
               Aun no hay servicios en esta categoria.
             </div>
 
-            <div v-else class="service-list">
+            <div v-else-if="isSectionExpanded(section.category)" class="service-list">
               <article v-for="service in section.services" :key="service.id" class="service-row">
                 <div class="service-main">
                   <span class="service-name">{{ service.name }}</span>
                   <span v-if="service.is_active === false" class="inactive-pill">Inactivo</span>
-                  <span class="service-meta">
+                  <span v-if="service.requires_deposit || (service.locations?.length ?? 0) > 0 || (service.stylists?.length ?? 0) > 0" class="service-meta">
                     {{ formatDuration(service.duration_min) }}
                     <span v-if="service.requires_deposit">- Sena {{ formatCurrency(Number(service.deposit_amount ?? 0)) }}</span>
                     <span v-if="(service.locations?.length ?? 0) > 0">- {{ service.locations?.length }} sedes</span>
                     <span v-if="(service.stylists?.length ?? 0) > 0">- {{ service.stylists?.length }} estilistas</span>
                   </span>
                 </div>
-                <div class="service-price">
-                  {{ formatCurrency(Number(service.base_price ?? 0)) }}
-                </div>
-                <div class="service-actions">
-                  <button
-                    class="icon-btn"
-                    type="button"
-                    title="Subir"
-                    @click="emit('move-service', { service, direction: 'up' })"
-                  >
-                    ^
-                  </button>
-                  <button
-                    class="icon-btn"
-                    type="button"
-                    title="Bajar"
-                    @click="emit('move-service', { service, direction: 'down' })"
-                  >
-                    v
-                  </button>
-                  <button class="icon-btn" type="button" @click="emit('edit-service', service)">Editar</button>
-                  <button class="icon-btn danger" type="button" @click="emit('delete-service', service)">
-                    Eliminar
-                  </button>
+                <div class="service-trailing">
+                  <span class="service-duration">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="8"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                      />
+                      <path
+                        d="M12 8v4l2.5 1.5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <span>{{ formatDuration(service.duration_min) }}</span>
+                  </span>
+                  <div class="service-price">
+                    {{ formatCurrency(Number(service.base_price ?? 0)) }}
+                  </div>
+                  <div class="service-actions">
+                    <button
+                      class="service-icon-btn"
+                      type="button"
+                      title="Subir"
+                      @click="emit('move-service', { service, direction: 'up' })"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M12 19V5M6 11l6-6 6 6"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      class="service-icon-btn"
+                      type="button"
+                      title="Bajar"
+                      @click="emit('move-service', { service, direction: 'down' })"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M12 5v14M18 13l-6 6-6-6"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </button>
+                    <button class="service-icon-btn" type="button" title="Editar" @click="emit('edit-service', service)">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M12 20h9"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </button>
+                    <button class="service-icon-btn danger" type="button" title="Eliminar" @click="emit('delete-service', service)">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M3 6h18"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                        />
+                        <path
+                          d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M19 6l-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M10 11v6M14 11v6"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.9"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </article>
             </div>
@@ -380,6 +585,10 @@ function categoryCount(categoryId: number | null): number {
   gap: 12px;
 }
 
+.category-card.collapsed {
+  gap: 0;
+}
+
 .category-header {
   display: flex;
   flex-wrap: wrap;
@@ -388,36 +597,117 @@ function categoryCount(categoryId: number | null): number {
   justify-content: space-between;
 }
 
-.category-title {
+.category-toggle {
+  border: none;
+  background: transparent;
+  padding: 0;
   display: flex;
   align-items: center;
   gap: 10px;
+  color: var(--ink-strong);
+  font: inherit;
 }
 
-.category-title h4 {
+.category-toggle.collapsible {
+  cursor: pointer;
+}
+
+.category-toggle h4 {
   margin: 0;
+}
+
+.category-chevron {
+  width: 18px;
+  height: 18px;
+  color: #9a94a1;
+  transition: transform 0.18s ease;
+}
+
+.category-chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.category-chevron svg {
+  width: 100%;
+  height: 100%;
 }
 
 .category-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.service-add-btn {
+  border: 1px solid rgba(17, 15, 20, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 12px;
+  padding: 0 14px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--ink-strong);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.service-add-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.header-icon-btn,
+.service-icon-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ink-strong);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.header-icon-btn svg,
+.service-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.header-icon-btn:hover,
+.service-icon-btn:hover {
+  background: rgba(17, 15, 20, 0.06);
+  transform: translateY(-1px);
+}
+
+.header-icon-btn.danger,
+.service-icon-btn.danger {
+  color: #c85c49;
 }
 
 .service-list {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .service-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1.5fr) auto auto;
-  gap: 12px;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 18px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(17, 15, 20, 0.06);
+  border: 1px solid rgba(17, 15, 20, 0.08);
 }
 
 .service-main {
@@ -447,35 +737,42 @@ function categoryCount(categoryId: number | null): number {
   color: var(--ink-muted);
 }
 
-.service-price {
+.service-trailing {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: flex-end;
+}
+
+.service-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 15, 20, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink-muted);
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--accent);
-  min-width: 90px;
+}
+
+.service-duration svg {
+  width: 14px;
+  height: 14px;
+}
+
+.service-price {
+  font-weight: 700;
+  color: #12a150;
+  min-width: 106px;
   text-align: right;
 }
 
 .service-actions {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 2px;
   justify-content: flex-end;
-}
-
-.icon-btn {
-  border: 1px solid rgba(17, 15, 20, 0.1);
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-weight: 600;
-  height: 32px;
-}
-
-.icon-btn.danger {
-  border-color: rgba(178, 75, 58, 0.3);
-  color: #b24b3a;
-  background: rgba(178, 75, 58, 0.08);
 }
 
 .empty-state,
@@ -500,8 +797,9 @@ function categoryCount(categoryId: number | null): number {
     grid-template-columns: 1fr;
   }
 
-  .service-price {
-    text-align: left;
+  .service-trailing {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .service-actions {

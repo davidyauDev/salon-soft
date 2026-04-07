@@ -11,6 +11,7 @@ export interface CatalogItem {
 export interface CatalogService {
   id: number
   name: string
+  duration_min?: number | null
   base_price: number
   is_active: boolean
 }

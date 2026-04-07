@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, reactive, watch } from 'vue'
 import type { InventoryCategory } from '../../composables/useInventoryCatalogs'
 
@@ -19,7 +19,7 @@ const error = reactive({ name: '' })
 const isEditing = computed(() => Boolean(props.initial))
 
 watch(
-  () => [props.open, props.initial],
+  () => [props.open, props.initial] as const,
   ([open, initial]) => {
     if (!open) return
     form.name = initial?.name ?? ''
@@ -28,10 +28,15 @@ watch(
   { immediate: true },
 )
 
+function requestClose(): void {
+  if (props.saving) return
+  emit('close')
+}
+
 function handleSubmit(): void {
   error.name = ''
   if (!form.name.trim()) {
-    error.name = 'Ingresa un nombre v�lido'
+    error.name = 'Ingresa un nombre válido'
     return
   }
   emit('submit', { name: form.name.trim() })
@@ -39,23 +44,31 @@ function handleSubmit(): void {
 </script>
 
 <template>
-  <div v-if="props.open" class="modal-backdrop" @click.self="emit('close')">
+  <div v-if="props.open" class="modal-backdrop" @click.self="requestClose">
     <div class="modal-card">
+      <div v-if="props.saving" class="saving-overlay" aria-live="polite">
+        <span class="saving-spinner" aria-hidden="true"></span>
+        <div class="saving-copy">
+          <strong>{{ isEditing ? 'Actualizando categoria...' : 'Creando categoria...' }}</strong>
+          <p>Guardando cambios y actualizando el listado.</p>
+        </div>
+      </div>
+
       <header class="modal-header">
         <h3>{{ isEditing ? 'Editar Categoria' : 'Crear Nueva Categoria' }}</h3>
-        <button class="close-button" type="button" @click="emit('close')">X</button>
+        <button class="close-button" type="button" :disabled="props.saving" @click="requestClose">X</button>
       </header>
 
       <form class="form-grid" @submit.prevent="handleSubmit">
-        <div v-if="props.saving" class="loading-hint">Guardando categoria...</div>
         <label class="field">
           Nombre de la Categoria *
           <input v-model="form.name" placeholder="Ej: Cuidado de cabello" :class="{ error: error.name }" :disabled="props.saving" />
           <span v-if="error.name" class="error-text">{{ error.name }}</span>
         </label>
         <div class="form-actions">
-          <button class="btn-ghost" type="button" @click="emit('close')" :disabled="props.saving">Cancelar</button>
-          <button class="btn-primary" type="submit" :disabled="props.saving">
+          <button class="btn-ghost" type="button" @click="requestClose" :disabled="props.saving">Cancelar</button>
+          <button class="btn-primary submit-btn" type="submit" :disabled="props.saving">
+            <span v-if="props.saving" class="btn-spinner" aria-hidden="true"></span>
             {{ props.saving ? 'Guardando...' : isEditing ? 'Guardar cambios' : 'Crear categoria' }}
           </button>
         </div>
@@ -76,6 +89,7 @@ function handleSubmit(): void {
 }
 
 .modal-card {
+  position: relative;
   width: min(620px, 100%);
   background: #fff;
   border-radius: 18px;
@@ -84,6 +98,46 @@ function handleSubmit(): void {
   padding: 24px;
   display: grid;
   gap: 16px;
+}
+
+.saving-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(6px);
+  border-radius: 18px;
+}
+
+.saving-copy {
+  display: grid;
+  gap: 4px;
+  max-width: 240px;
+}
+
+.saving-copy strong {
+  color: #1f1d29;
+}
+
+.saving-copy p {
+  margin: 0;
+  color: #6f6770;
+  font-size: 0.9rem;
+}
+
+.saving-spinner,
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(90, 75, 255, 0.18);
+  border-top-color: #5a4bff;
+  animation: spin 0.8s linear infinite;
 }
 
 .modal-header {
@@ -102,17 +156,14 @@ function handleSubmit(): void {
   font-size: 1rem;
 }
 
+.close-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .form-grid {
   display: grid;
   gap: 16px;
-}
-
-.loading-hint {
-  background: rgba(90, 75, 255, 0.08);
-  color: #4f46e5;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 0.85rem;
 }
 
 .field {
@@ -146,6 +197,20 @@ function handleSubmit(): void {
   gap: 12px;
 }
 
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-color: rgba(255, 255, 255, 0.28);
+  border-top-color: #fff;
+}
+
 .btn-primary {
   padding: 10px 18px;
   border-radius: 12px;
@@ -170,4 +235,11 @@ function handleSubmit(): void {
   font-weight: 600;
   cursor: pointer;
 }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>
+

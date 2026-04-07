@@ -118,6 +118,17 @@ export function useProducts() {
     await load()
   }
 
+  function clearCategoryFromItems(categoryId: number): void {
+    items.value = items.value.map((item) =>
+      item.category?.id === categoryId
+        ? {
+            ...item,
+            category: null,
+          }
+        : item,
+    )
+  }
+
   const totalCount = computed(() => items.value.length)
 
   return {
@@ -130,5 +141,6 @@ export function useProducts() {
     updateProduct,
     deleteProduct,
     createInitialStock,
+    clearCategoryFromItems,
   }
 }

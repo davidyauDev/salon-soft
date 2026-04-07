@@ -4,6 +4,7 @@ import type { InventoryCategory } from '../../composables/useInventoryCatalogs'
 const props = defineProps<{
   open: boolean
   categories: InventoryCategory[]
+  processingId?: number | null
 }>()
 
 const emit = defineEmits<{
@@ -12,17 +13,41 @@ const emit = defineEmits<{
   (e: 'edit', category: InventoryCategory): void
   (e: 'remove', category: InventoryCategory): void
 }>()
+
+function requestClose(): void {
+  if (props.processingId !== null && props.processingId !== undefined) return
+  emit('close')
+}
 </script>
 
 <template>
-  <div v-if="props.open" class="modal-backdrop" @click.self="emit('close')">
+  <div v-if="props.open" class="modal-backdrop" @click.self="requestClose">
     <div class="modal-card">
+      <div v-if="props.processingId !== null && props.processingId !== undefined" class="modal-inline-status">
+        <span class="inline-spinner" aria-hidden="true"></span>
+        <span>Eliminando categoria...</span>
+      </div>
+
       <header class="modal-header">
         <div class="title-group">
           <h3>Gestionar Categorias</h3>
-          <button class="add-btn" type="button" @click="emit('create')">+</button>
+          <button
+            class="add-btn"
+            type="button"
+            :disabled="props.processingId !== null && props.processingId !== undefined"
+            @click="emit('create')"
+          >
+            +
+          </button>
         </div>
-        <button class="close-button" type="button" @click="emit('close')">X</button>
+        <button
+          class="close-button"
+          type="button"
+          :disabled="props.processingId !== null && props.processingId !== undefined"
+          @click="requestClose"
+        >
+          X
+        </button>
       </header>
 
       <div class="table">
@@ -30,20 +55,71 @@ const emit = defineEmits<{
           <span>Nombre</span>
           <span class="actions-col">Acciones</span>
         </div>
-        <div v-for="category in props.categories" :key="category.id" class="table-row">
+        <div
+          v-for="category in props.categories"
+          :key="category.id"
+          class="table-row"
+          :class="{ processing: props.processingId === category.id }"
+        >
           <span>{{ category.name }}</span>
           <div class="row-actions">
-            <button class="icon-btn" type="button" @click="emit('edit', category)" aria-label="Editar">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
+            <button
+              class="icon-btn"
+              type="button"
+              :disabled="props.processingId !== null && props.processingId !== undefined"
+              @click="emit('edit', category)"
+              aria-label="Editar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
-                  d="M4 16.5V20h3.5L18 9.5l-3.5-3.5L4 16.5Zm16.7-10.8a1 1 0 0 0 0-1.4l-1-1a1 1 0 0 0-1.4 0l-1.6 1.6 3.5 3.5 1.5-1.7Z"
+                  d="M12 20h9"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 />
               </svg>
             </button>
-            <button class="icon-btn danger" type="button" @click="emit('remove', category)" aria-label="Eliminar">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
+            <button
+              class="icon-btn danger"
+              type="button"
+              :disabled="props.processingId !== null && props.processingId !== undefined"
+              @click="emit('remove', category)"
+              aria-label="Eliminar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
-                  d="M9 3h6l1 2h4v2H4V5h4l1-2Zm1 6h2v8h-2V9Zm4 0h2v8h-2V9Zm-8 0h2v8H6V9Z"
+                  d="M3 6h18"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M19 6l-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10 11v6M14 11v6"
+                  stroke="currentColor"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
                 />
               </svg>
             </button>
@@ -74,6 +150,28 @@ const emit = defineEmits<{
   padding: 24px;
   display: grid;
   gap: 16px;
+}
+
+.modal-inline-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(90, 75, 255, 0.08);
+  color: #4f46e5;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.inline-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(90, 75, 255, 0.18);
+  border-top-color: #5a4bff;
+  animation: spin 0.8s linear infinite;
 }
 
 .modal-header {
@@ -109,6 +207,14 @@ const emit = defineEmits<{
   font-size: 1rem;
 }
 
+.add-btn:disabled,
+.close-button:disabled,
+.icon-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .table {
   border: 1px solid rgba(17, 15, 20, 0.12);
   border-radius: 14px;
@@ -136,38 +242,55 @@ const emit = defineEmits<{
   font-size: 0.9rem;
 }
 
+.table-row.processing {
+  opacity: 0.55;
+}
+
 .row-actions {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid rgba(17, 15, 20, 0.12);
-  background: #fff;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
   display: grid;
   place-items: center;
   cursor: pointer;
+  color: #1f1d29;
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .icon-btn svg {
-  width: 16px;
-  height: 16px;
-  fill: #1f1d29;
+  width: 18px;
+  height: 18px;
+  overflow: visible;
 }
 
 .icon-btn.danger {
-  border-color: rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.08);
+  color: #ff2f6d;
 }
 
-.icon-btn.danger svg {
-  fill: #ef4444;
+.icon-btn:hover {
+  opacity: 0.72;
+  transform: translateY(-1px);
 }
 
 .actions-col {
-  text-align: right;
+  text-align: center;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

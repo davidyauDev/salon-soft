@@ -63,20 +63,28 @@ async function load(): Promise<void> {
   }
 }
 
-async function createCategory(payload: Record<string, unknown>): Promise<void> {
-  await apiFetch('/api/service-categories', {
+async function createCategory(payload: Record<string, unknown>): Promise<ServiceCategory> {
+  const response = await apiFetch<ServiceCategory>('/api/service-categories', {
     method: 'POST',
     body: JSON.stringify(payload),
   })
-  await load()
+  const created = unwrapData(response) as ServiceCategory
+  categories.value = [...categories.value, created].sort(
+    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name),
+  )
+  return created
 }
 
-async function updateCategory(categoryId: number, payload: Record<string, unknown>): Promise<void> {
-  await apiFetch(`/api/service-categories/${categoryId}`, {
+async function updateCategory(categoryId: number, payload: Record<string, unknown>): Promise<ServiceCategory> {
+  const response = await apiFetch<ServiceCategory>(`/api/service-categories/${categoryId}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
   })
-  await load()
+  const updated = unwrapData(response) as ServiceCategory
+  categories.value = categories.value
+    .map((category) => (category.id === categoryId ? updated : category))
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name))
+  return updated
 }
 
 async function deleteCategory(categoryId: number): Promise<void> {

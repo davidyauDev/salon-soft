@@ -46,19 +46,37 @@ export function useInventoryCatalogs() {
     }
   }
 
-  async function createCategory(payload: { name: string; description?: string | null }): Promise<void> {
-    await apiFetch('/api/categories', { method: 'POST', body: JSON.stringify(payload) })
-    await load()
+  async function createCategory(payload: {
+    name: string
+    description?: string | null
+  }): Promise<InventoryCategory> {
+    const response = await apiFetch<InventoryCategory>('/api/categories', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+    const created = unwrapData(response) as InventoryCategory
+    categories.value = [...categories.value, created].sort((a, b) => a.name.localeCompare(b.name))
+    return created
   }
 
-  async function updateCategory(id: number, payload: { name: string; description?: string | null }): Promise<void> {
-    await apiFetch(`/api/categories/${id}`, { method: 'PUT', body: JSON.stringify(payload) })
-    await load()
+  async function updateCategory(id: number, payload: {
+    name: string
+    description?: string | null
+  }): Promise<InventoryCategory> {
+    const response = await apiFetch<InventoryCategory>(`/api/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    })
+    const updated = unwrapData(response) as InventoryCategory
+    categories.value = categories.value
+      .map((category) => (category.id === id ? updated : category))
+      .sort((a, b) => a.name.localeCompare(b.name))
+    return updated
   }
 
   async function deleteCategory(id: number): Promise<void> {
     await apiFetch(`/api/categories/${id}`, { method: 'DELETE' })
-    await load()
+    categories.value = categories.value.filter((category) => category.id !== id)
   }
 
   async function createBrand(payload: { name: string }): Promise<void> {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, shallowRef } from 'vue'
 import { useServiceCatalog, type ServiceCategory, type ServiceItem } from '../../composables/useServiceCatalog'
-import { notifySuccess } from '../../lib/notify'
+import { notifyCategoryChanged, notifyError, notifySuccess } from '../../lib/notify'
 import { confirmDelete } from '../../lib/confirm'
 import ServiceCatalogPanel from '../services/ServiceCatalogPanel.vue'
 import ServiceCategoryModal from '../services/ServiceCategoryModal.vue'
@@ -36,6 +36,7 @@ function openCategoryEdit(category: ServiceCategory): void {
 }
 
 function closeCategoryModal(): void {
+  if (savingCategory.value) return
   showCategoryModal.value = false
   categoryEditing.value = null
 }
@@ -52,12 +53,17 @@ async function submitCategory(payload: { name: string; is_active: boolean }): Pr
   try {
     if (categoryEditing.value) {
       await catalog.updateCategory(categoryEditing.value.id, payload)
-      notifySuccess('Categoria actualizada')
+      showCategoryModal.value = false
+      categoryEditing.value = null
+      notifyCategoryChanged({ name: payload.name, mode: 'updated' })
     } else {
       await catalog.createCategory(payload)
-      notifySuccess('Categoria creada')
+      showCategoryModal.value = false
+      categoryEditing.value = null
+      notifyCategoryChanged({ name: payload.name, mode: 'created' })
     }
-    closeCategoryModal()
+  } catch (err) {
+    notifyError('No se pudo guardar la categoria', (err as Error).message)
   } finally {
     savingCategory.value = false
   }

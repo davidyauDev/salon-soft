@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CommissionController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ExpressSaleController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\LocationController;
@@ -46,6 +47,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('purchases', [PurchaseController::class, 'store']);
     Route::get('sales', [SaleController::class, 'index']);
     Route::post('sales', [SaleController::class, 'store']);
+    Route::get('express-sales', [ExpressSaleController::class, 'index']);
+    Route::post('express-sales', [ExpressSaleController::class, 'store']);
     Route::get('service-records', [ServiceRecordController::class, 'index']);
     Route::post('service-records', [ServiceRecordController::class, 'store']);
     Route::patch('service-records/{record}', [ServiceRecordController::class, 'update']);

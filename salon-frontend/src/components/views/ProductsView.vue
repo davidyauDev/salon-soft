@@ -3,7 +3,7 @@ import { computed, onMounted, shallowRef } from 'vue'
 import { useProducts } from '../../composables/useProducts'
 import { useInventoryCatalogs } from '../../composables/useInventoryCatalogs'
 import { confirmDelete } from '../../lib/confirm'
-import { notifySuccess, notifyError } from '../../lib/notify'
+import { notifyCategoryChanged, notifyError, notifyProductSaved, notifySuccess } from '../../lib/notify'
 import type { InventoryCategory } from '../../composables/useInventoryCatalogs'
 import type { ProductItem } from '../../composables/useProducts'
 import ProductTable from '../products/ProductTable.vue'
@@ -22,6 +22,7 @@ const showCategoryForm = shallowRef(false)
 const showCategoryManage = shallowRef(false)
 const savingProduct = shallowRef(false)
 const savingCategory = shallowRef(false)
+const processingCategoryId = shallowRef<number | null>(null)
 const editingProduct = shallowRef<ProductItem | null>(null)
 const editingCategory = shallowRef<InventoryCategory | null>(null)
 const returnToProductModal = shallowRef(false)
@@ -54,7 +55,9 @@ function openEditProduct(item: ProductItem): void {
 }
 
 function closeProductModal(): void {
+  if (savingProduct.value) return
   showProductModal.value = false
+  editingProduct.value = null
 }
 
 function openCategoryManager(): void {
@@ -62,6 +65,7 @@ function openCategoryManager(): void {
 }
 
 function closeCategoryManager(): void {
+  if (processingCategoryId.value !== null) return
   showCategoryManage.value = false
 }
 
@@ -70,7 +74,8 @@ function openCategoryForm(category: InventoryCategory | null = null): void {
   showCategoryForm.value = true
 }
 
-function closeCategoryForm(): void {
+function closeCategoryForm(force = false): void {
+  if (savingCategory.value && !force) return
   showCategoryForm.value = false
   editingCategory.value = null
   if (returnToProductModal.value) {
@@ -83,6 +88,20 @@ function openCategoryFromProduct(): void {
   returnToProductModal.value = true
   showProductModal.value = false
   openCategoryForm(null)
+}
+
+function sanitizeProductErrorMessage(message: string): string {
+  const normalized = message.toLowerCase()
+
+  if (
+    normalized.includes('numeric value out of range')
+    || normalized.includes('numeric field overflow')
+    || normalized.includes('out of range')
+  ) {
+    return 'Revisa stock, costo o precio. Uno de los valores es demasiado grande.'
+  }
+
+  return message
 }
 
 async function resolveBrandId(name: string): Promise<number | null> {
@@ -115,6 +134,7 @@ async function submitProduct(payload: {
   try {
     const brandId = await resolveBrandId(payload.brand)
     const priceValue = payload.price ? Number(payload.price) : 0
+    const categoryName = catalogs.categories.value.find((category) => category.id === payload.category_id)?.name ?? null
 
     if (editingProduct.value) {
       await products.updateProduct(editingProduct.value.id, {
@@ -124,7 +144,14 @@ async function submitProduct(payload: {
         sale_price: priceValue,
         description: payload.description,
       })
-      notifySuccess('Producto actualizado')
+      showProductModal.value = false
+      editingProduct.value = null
+      notifyProductSaved({
+        name: payload.name,
+        mode: 'updated',
+        category: categoryName,
+        brand: payload.brand || null,
+      })
     } else {
       const created = await products.createProduct({
         name: payload.name,
@@ -136,22 +163,33 @@ async function submitProduct(payload: {
 
       const stockValue = payload.stock ? Number(payload.stock) : 0
       const costValue = payload.cost ? Number(payload.cost) : 0
+      let successNote: string | null = null
 
       if (stockValue > 0) {
-        await products.createInitialStock({
-          item_id: created.id,
-          quantity: stockValue,
-          cost_per_unit: costValue,
-        })
+        try {
+          await products.createInitialStock({
+            item_id: created.id,
+            quantity: stockValue,
+            cost_per_unit: costValue,
+          })
+        } catch {
+          successNote = 'El producto se guardo, pero el stock inicial no pudo registrarse. Revisalo desde inventario.'
+        }
       }
 
-      notifySuccess('Producto creado')
+      showProductModal.value = false
+      editingProduct.value = null
+      notifyProductSaved({
+        name: payload.name,
+        mode: 'created',
+        category: categoryName,
+        brand: payload.brand || null,
+        stock: stockValue,
+        note: successNote,
+      })
     }
-
-    showProductModal.value = false
-    editingProduct.value = null
   } catch (err) {
-    notifyError('No se pudo guardar el producto', (err as Error).message)
+    notifyError('No se pudo guardar el producto', sanitizeProductErrorMessage((err as Error).message))
   } finally {
     savingProduct.value = false
   }
@@ -160,8 +198,12 @@ async function submitProduct(payload: {
 async function removeProduct(item: ProductItem): Promise<void> {
   const ok = await confirmDelete('Eliminar este producto?')
   if (!ok) return
-  await products.deleteProduct(item.id)
-  notifySuccess('Producto eliminado')
+  try {
+    await products.deleteProduct(item.id)
+    notifySuccess('Producto eliminado')
+  } catch (err) {
+    notifyError('No se pudo eliminar el producto', (err as Error).message)
+  }
 }
 
 async function submitCategory(payload: { name: string }): Promise<void> {
@@ -170,12 +212,14 @@ async function submitCategory(payload: { name: string }): Promise<void> {
   try {
     if (editingCategory.value) {
       await catalogs.updateCategory(editingCategory.value.id, { name: payload.name })
-      notifySuccess('Categoria actualizada')
+      closeCategoryForm(true)
+      notifyCategoryChanged({ name: payload.name, mode: 'updated' })
     } else {
       await catalogs.createCategory({ name: payload.name })
-      notifySuccess('Categoria creada')
+      closeCategoryForm(true)
+      notifyCategoryChanged({ name: payload.name, mode: 'created' })
     }
-    closeCategoryForm()
+    void products.load()
   } catch (err) {
     notifyError('No se pudo guardar la categoria', (err as Error).message)
   } finally {
@@ -184,10 +228,20 @@ async function submitCategory(payload: { name: string }): Promise<void> {
 }
 
 async function removeCategory(category: InventoryCategory): Promise<void> {
+  if (processingCategoryId.value !== null) return
   const ok = await confirmDelete('Eliminar esta categoria?')
   if (!ok) return
-  await catalogs.deleteCategory(category.id)
-  notifySuccess('Categoria eliminada')
+  processingCategoryId.value = category.id
+  try {
+    await catalogs.deleteCategory(category.id)
+    products.clearCategoryFromItems(category.id)
+    notifyCategoryChanged({ name: category.name, mode: 'deleted' })
+    void products.load()
+  } catch (err) {
+    notifyError('No se pudo eliminar la categoria', (err as Error).message)
+  } finally {
+    processingCategoryId.value = null
+  }
 }
 
 function editCategory(category: InventoryCategory): void {
@@ -252,6 +306,7 @@ function editCategory(category: InventoryCategory): void {
     <CategoryManageModal
       :open="showCategoryManage"
       :categories="catalogs.categories.value"
+      :processing-id="processingCategoryId"
       @close="closeCategoryManager"
       @create="openCategoryForm"
       @edit="editCategory"
