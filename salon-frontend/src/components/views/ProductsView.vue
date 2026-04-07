@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, shallowRef } from 'vue'
+import { computed, onMounted, shallowRef, watch } from 'vue'
 import { useProducts } from '../../composables/useProducts'
 import { useInventoryCatalogs } from '../../composables/useInventoryCatalogs'
 import { confirmDelete } from '../../lib/confirm'
@@ -14,7 +14,8 @@ import CategoryManageModal from '../products/CategoryManageModal.vue'
 const products = useProducts()
 const catalogs = useInventoryCatalogs()
 
-const itemsPerPage = shallowRef(100)
+const itemsPerPage = shallowRef(12)
+const currentPage = shallowRef(1)
 
 const showProductModal = shallowRef(false)
 const showCategoryForm = shallowRef(false)
@@ -31,7 +32,28 @@ onMounted(() => {
   catalogs.load()
 })
 
-const pagedProducts = computed(() => products.items.value.slice(0, itemsPerPage.value))
+const totalProducts = computed(() => products.items.value.length)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalProducts.value / itemsPerPage.value)))
+const pagedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  return products.items.value.slice(start, start + itemsPerPage.value)
+})
+
+const pageStart = computed(() => (totalProducts.value ? (currentPage.value - 1) * itemsPerPage.value + 1 : 0))
+const pageEnd = computed(() => Math.min(currentPage.value * itemsPerPage.value, totalProducts.value))
+
+watch(
+  [itemsPerPage, totalProducts],
+  () => {
+    if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
+    if (currentPage.value < 1) currentPage.value = 1
+  },
+  { immediate: true },
+)
+
+function goToPage(page: number): void {
+  currentPage.value = Math.min(Math.max(page, 1), totalPages.value)
+}
 
 function openCreateProduct(): void {
   editingProduct.value = null
@@ -260,13 +282,31 @@ function editCategory(category: InventoryCategory): void {
     />
 
     <div class="table-footer">
-      <span>Items por pagina</span>
-      <select v-model.number="itemsPerPage">
-        <option :value="15">15</option>
-        <option :value="20">20</option>
-        <option :value="50">50</option>
-        <option :value="100">100</option>
-      </select>
+      <div class="page-meta">
+        <span>Mostrando</span>
+        <strong>{{ pageStart }}-{{ pageEnd }}</strong>
+        <span>de {{ totalProducts }}</span>
+      </div>
+      <div class="page-controls">
+        <label>
+          Por pagina
+          <select v-model.number="itemsPerPage">
+            <option :value="8">8</option>
+            <option :value="12">12</option>
+            <option :value="20">20</option>
+            <option :value="30">30</option>
+          </select>
+        </label>
+        <div class="pager">
+          <button class="pager-btn" type="button" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+            Anterior
+          </button>
+          <span class="pager-count">Pagina {{ currentPage }} / {{ totalPages }}</span>
+          <button class="pager-btn" type="button" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
+            Siguiente
+          </button>
+        </div>
+      </div>
     </div>
 
     <ProductFormModal
@@ -349,11 +389,61 @@ function editCategory(category: InventoryCategory): void {
 
 .table-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   color: #6f6963;
   font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.page-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-meta strong {
+  color: #111111;
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.page-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pager-btn {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(25, 25, 25, 0.12);
+  background: #fffdfb;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pager-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pager-count {
+  color: #6f6963;
+  font-size: 0.82rem;
 }
 
 .table-footer select {
@@ -373,6 +463,43 @@ function editCategory(category: InventoryCategory): void {
     width: 100%;
     justify-content: flex-start;
     flex-wrap: wrap;
+  }
+
+  .header-actions > * {
+    flex: 1 1 160px;
+  }
+
+  .table-footer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .products-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .header-actions > * {
+    flex: 1 1 100%;
+  }
+
+  .page-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .page-controls label,
+  .pager {
+    width: 100%;
+  }
+
+  .pager {
+    justify-content: space-between;
+  }
+
+  .page-controls select {
+    width: 100%;
   }
 }
 </style>

@@ -91,6 +91,7 @@ function handleSubmit(): void {
 .modal-card {
   position: relative;
   width: min(620px, 100%);
+  max-height: min(88vh, 760px);
   background: #fff;
   border-radius: 18px;
   border: 1px solid rgba(17, 15, 20, 0.12);
@@ -98,6 +99,7 @@ function handleSubmit(): void {
   padding: 24px;
   display: grid;
   gap: 16px;
+  overflow: auto;
 }
 
 .saving-overlay {
@@ -239,6 +241,41 @@ function handleSubmit(): void {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .modal-backdrop {
+    padding: 12px;
+    align-items: stretch;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .modal-header {
+    align-items: flex-start;
+  }
+
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions > * {
+    width: 100%;
+  }
+
+  .saving-overlay {
+    flex-direction: column;
+    text-align: center;
   }
 }
 </style>

@@ -143,6 +143,7 @@ function requestClose(): void {
 
 .modal-card {
   width: min(640px, 100%);
+  max-height: min(88vh, 760px);
   background: #fff;
   border-radius: 18px;
   border: 1px solid rgba(17, 15, 20, 0.12);
@@ -150,6 +151,7 @@ function requestClose(): void {
   padding: 24px;
   display: grid;
   gap: 16px;
+  overflow: auto;
 }
 
 .modal-inline-status {
@@ -291,6 +293,52 @@ function requestClose(): void {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .modal-backdrop {
+    padding: 12px;
+    align-items: stretch;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .modal-header {
+    align-items: flex-start;
+  }
+
+  .title-group {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .table-head {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .row-actions {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid rgba(17, 15, 20, 0.1);
+    background: #fffdfa;
   }
 }
 </style>

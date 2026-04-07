@@ -29,26 +29,27 @@ function formatStock(value: number): string {
     <div v-if="props.loading" class="table-empty">Cargando productos...</div>
     <div v-else-if="props.error" class="table-empty error">{{ props.error }}</div>
     <div v-else-if="!props.items.length" class="table-empty">No hay productos registrados.</div>
-      <div v-else class="table-wrap">
-        <div class="table-row table-head">
-          <span>Nombre</span>
-          <span>Categoria</span>
-          <span>Marca</span>
-          <span>Stock</span>
-          <span>Costo</span>
-          <span>Precio</span>
-          <span class="actions-col">Acciones</span>
-        </div>
-        <div v-for="item in props.items" :key="item.id" class="table-row">
+    <div v-else class="table-wrap">
+      <div class="table-row table-head">
+        <span>Nombre</span>
+        <span>Categoria / Marca</span>
+        <span>Stock</span>
+        <span>Costo</span>
+        <span>Precio</span>
+        <span class="actions-col">Acciones</span>
+      </div>
+      <div v-for="item in props.items" :key="item.id" class="table-row">
         <div class="cell-name" data-label="Nombre">
           <p class="name">{{ item.name }}</p>
         </div>
-        <span class="category-pill" data-label="Categoria">{{ item.category?.name ?? 'Sin categoria' }}</span>
-        <span class="brand-text" data-label="Marca">{{ item.brand?.name ?? '-' }}</span>
+        <div class="product-meta" data-label="Categoria / Marca">
+          <span class="category-pill">{{ item.category?.name ?? 'Sin categoria' }}</span>
+          <span class="brand-text">{{ item.brand?.name ?? '-' }}</span>
+        </div>
         <span class="stock-pill" data-label="Stock">{{ formatStock(item.stock_total) }}</span>
-          <span class="cost" data-label="Costo">{{ formatCurrency(averageCost(item)) }}</span>
-          <span class="price" data-label="Precio">{{ formatCurrency(Number(item.sale_price ?? 0)) }}</span>
-          <div class="row-actions" data-label="Acciones">
+        <span class="cost" data-label="Costo">{{ formatCurrency(averageCost(item)) }}</span>
+        <span class="price" data-label="Precio">{{ formatCurrency(Number(item.sale_price ?? 0)) }}</span>
+        <div class="row-actions" data-label="Acciones">
           <button class="icon-btn" type="button" @click="emit('edit', item)" aria-label="Editar">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
@@ -97,11 +98,11 @@ function formatStock(value: number): string {
               />
             </svg>
           </button>
-          </div>
         </div>
       </div>
-    </section>
-  </template>
+    </div>
+  </section>
+</template>
 
 <style scoped>
 .products-table {
@@ -117,7 +118,7 @@ function formatStock(value: number): string {
 
 .table-row {
   display: grid;
-  grid-template-columns: 1.8fr 1.2fr 1fr 0.7fr 0.8fr 0.8fr 0.7fr;
+  grid-template-columns: 1.8fr 1.6fr 0.7fr 0.8fr 0.8fr 0.7fr;
   gap: 16px;
   align-items: center;
   padding: 14px 18px;
@@ -139,6 +140,13 @@ function formatStock(value: number): string {
   font-weight: 600;
 }
 
+.product-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .category-pill {
   display: inline-flex;
   align-items: center;
@@ -154,6 +162,7 @@ function formatStock(value: number): string {
 
 .brand-text {
   color: var(--ink-muted);
+  font-size: 0.85rem;
 }
 
 .stock-pill {
@@ -231,7 +240,7 @@ function formatStock(value: number): string {
 
 @media (max-width: 1000px) {
   .table-row {
-    grid-template-columns: 1.4fr 1fr 0.8fr 0.6fr 0.8fr 0.8fr auto;
+    grid-template-columns: 1.4fr 1.2fr 0.7fr 0.6fr 0.8fr auto;
     font-size: 0.85rem;
   }
 }
@@ -242,11 +251,16 @@ function formatStock(value: number): string {
   }
 
   .table-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 12px;
-    padding: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "name name"
+      "stock price"
+      "actions actions";
+    gap: 8px 10px;
+    padding: 12px 14px;
     border-radius: 16px;
     border-top: 1px solid rgba(17, 15, 20, 0.06);
+    align-items: start;
   }
 
   .table-row > * {
@@ -257,37 +271,64 @@ function formatStock(value: number): string {
     align-items: flex-start;
   }
 
-  .table-row > *::before {
-    content: attr(data-label);
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--ink-muted);
-    font-weight: 600;
-  }
-
   .cell-name {
-    grid-column: 1 / -1;
+    grid-area: name;
   }
 
   .cell-name .name {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.98rem;
+    line-height: 1.2;
   }
 
-  .category-pill,
+  .product-meta {
+    display: none;
+  }
+
   .stock-pill {
+    grid-area: stock;
     width: fit-content;
+    min-width: 56px;
+    height: auto;
+    padding: 6px 10px;
+    justify-self: start;
+    align-self: start;
+  }
+
+  .cost {
+    display: none;
+  }
+
+  .price {
+    grid-area: price;
+    align-self: center;
+    font-size: 0.9rem;
   }
 
   .row-actions {
-    grid-column: 1 / -1;
+    grid-area: actions;
     justify-content: flex-end;
-    padding-top: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 2px;
+    gap: 8px;
   }
 
-  .row-actions::before {
-    margin-right: auto;
+  .row-actions > .icon-btn {
+    width: auto;
+    min-width: 42px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(17, 15, 20, 0.1);
+    background: #fffdfa;
+    gap: 0;
+  }
+
+  .row-actions > .icon-btn svg {
+    width: 16px;
+    height: 16px;
   }
 }
 </style>

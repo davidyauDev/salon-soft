@@ -13,6 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   logout: []
+  openMenu: []
 }>()
 
 const dateLabel = shallowRef(
@@ -26,6 +27,17 @@ const dateLabel = shallowRef(
 
 <template>
   <header class="topbar">
+    <button class="menu-button" type="button" aria-label="Abrir menu" @click="emit('openMenu')">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M4 6h16M4 12h16M4 18h16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.9"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
     <div class="header-copy">
       <p class="eyebrow">Resumen operativo</p>
       <h1 class="headline">Todo listo para hoy</h1>
@@ -62,6 +74,29 @@ const dateLabel = shallowRef(
   align-items: center;
   padding: 4px 2px 14px;
   border-bottom: 1px solid rgba(25, 25, 25, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: linear-gradient(180deg, rgba(250, 248, 244, 0.96), rgba(250, 248, 244, 0.84));
+  backdrop-filter: blur(10px);
+}
+
+.menu-button {
+  display: none;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid rgba(25, 25, 25, 0.12);
+  background: rgba(255, 253, 251, 0.92);
+  color: var(--ink-strong);
+  cursor: pointer;
+}
+
+.menu-button svg {
+  width: 20px;
+  height: 20px;
 }
 
 .header-copy {
@@ -178,19 +213,30 @@ const dateLabel = shallowRef(
 
 @media (max-width: 820px) {
   .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    padding: 8px 0 12px;
+  }
+
+  .menu-button {
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+
+  .header-copy {
+    flex: 1 1 180px;
+    min-width: 0;
   }
 
   .topbar-actions {
     width: 100%;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-between;
   }
 
   .headline {
-    font-size: 1.7rem;
+    font-size: 1.45rem;
   }
 
   .date {
@@ -198,12 +244,36 @@ const dateLabel = shallowRef(
   }
 
   .alerts-pill {
-    width: auto;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .alerts-label {
+    display: none;
+  }
+
+  .alerts-count {
+    min-width: 18px;
+    height: 18px;
   }
 
   .user-chip {
-    width: 100%;
+    width: auto;
+    flex: 1 1 auto;
     justify-content: space-between;
+    min-width: 0;
+    padding: 8px 10px;
+  }
+
+  .user-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+
+  .logout {
+    padding: 6px 9px;
   }
 }
 </style>

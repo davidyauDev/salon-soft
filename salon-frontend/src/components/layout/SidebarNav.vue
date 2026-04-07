@@ -27,6 +27,12 @@ interface NavItem {
 
 const props = defineProps<{
   user: UserProfile | null
+  mobileOpen: boolean
+}>()
+
+const emit = defineEmits<{
+  close: []
+  navigate: []
 }>()
 
 const route = useRoute()
@@ -80,7 +86,7 @@ const profileInitials = computed(() =>
 </script>
 
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ open: props.mobileOpen }">
     <section class="brand-card">
       <div class="brand-top">
         <div class="brand-mark" aria-hidden="true">
@@ -92,6 +98,18 @@ const profileInitials = computed(() =>
           <h2>Salon Control</h2>
           <p>Panel operativo del salon</p>
         </div>
+
+        <button class="drawer-close" type="button" aria-label="Cerrar menu" @click="emit('close')">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M6 6l12 12M18 6 6 18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
       </div>
 
       <div class="brand-meta">
@@ -108,6 +126,7 @@ const profileInitials = computed(() =>
         class="nav-item"
         :class="{ active: route.path === item.to || route.path.startsWith(`${item.to}/`) }"
         :to="item.to"
+        @click="emit('navigate')"
       >
         <span class="nav-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
@@ -169,6 +188,10 @@ const profileInitials = computed(() =>
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.drawer-close {
+  display: none;
 }
 
 .brand-mark {
@@ -439,66 +462,100 @@ const profileInitials = computed(() =>
 
 @media (max-width: 820px) {
   .sidebar {
-    position: relative;
-    min-height: auto;
-    height: auto;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 50;
+    width: min(86vw, 332px);
+    min-height: 100vh;
+    height: 100vh;
     gap: 12px;
-    padding: 12px 12px 10px;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 18px 16px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: none;
+    transform: translateX(-104%);
+    transition: transform 0.24s ease;
+    box-shadow: 28px 0 50px rgba(0, 0, 0, 0.28);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
   }
 
   .brand-card {
-    padding: 12px;
+    padding: 16px;
+  }
+
+  .brand-top {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .drawer-close {
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fffdf8;
+    display: inline-grid;
+    place-items: center;
+    cursor: pointer;
+    flex: none;
+  }
+
+  .drawer-close svg {
+    width: 18px;
+    height: 18px;
   }
 
   .brand-copy,
   .nav-copy,
-  .nav-badge,
+  .profile-copy {
+    display: grid;
+  }
+
   .brand-meta,
-  .profile-copy,
+  .nav-badge,
   .settings {
-    display: none;
+    display: inline-flex;
   }
 
   .nav-block {
-    display: flex;
+    display: grid;
     gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    margin: 0 -2px;
-    scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible;
+    padding-bottom: 0;
+    margin: 0;
   }
 
   .nav-block .section-label {
-    display: none;
+    display: block;
   }
 
   .nav-item {
-    flex: 0 0 auto;
-    width: 62px;
-    min-width: 62px;
-    height: 62px;
-    padding: 0;
-    grid-template-columns: 1fr;
-    justify-items: center;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    padding: 12px 14px;
+    grid-template-columns: auto 1fr auto;
+    justify-items: stretch;
   }
 
   .nav-item .nav-icon {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
   }
 
   .nav-item.active::before {
-    inset: auto auto 6px 50%;
-    width: 18px;
-    height: 3px;
-    transform: translateX(-50%);
+    inset: 8px auto 8px 8px;
+    width: 3px;
+    height: auto;
+    transform: none;
   }
 
   .sidebar-foot {
-    display: none;
+    display: grid;
   }
 }
 </style>
