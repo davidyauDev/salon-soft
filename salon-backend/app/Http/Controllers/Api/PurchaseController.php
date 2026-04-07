@@ -24,10 +24,13 @@ class PurchaseController extends Controller
         return [
             'id' => $lot->id,
             'item_id' => $lot->item_id,
+            'supplier_id' => $lot->supplier_id,
             'quantity_remaining' => $lot->quantity_remaining,
             'cost_per_base' => $lot->cost_per_base,
             'purchased_at' => $lot->purchased_at,
             'expires_at' => $lot->expires_at,
+            'lot_code' => $lot->lot_code,
+            'invoice_number' => $lot->invoice_number,
         ];
     }
 }

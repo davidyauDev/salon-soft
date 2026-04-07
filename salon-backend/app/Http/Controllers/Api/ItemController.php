@@ -17,7 +17,7 @@ class ItemController extends Controller
 {
     public function index(): JsonResponse
     {
-        $items = Item::query()->with('units')->orderBy('name')->get();
+        $items = Item::query()->with(['units', 'category', 'brand'])->orderBy('name')->get();
 
         return response()->json(ItemResource::collection($items));
     }
@@ -28,12 +28,12 @@ class ItemController extends Controller
 
         $this->syncUnits($item, $request->input('units'));
 
-        return response()->json(new ItemResource($item->load('units')), 201);
+        return response()->json(new ItemResource($item->load(['units', 'category', 'brand'])), 201);
     }
 
     public function show(Item $item): JsonResponse
     {
-        return response()->json(new ItemResource($item->load('units')));
+        return response()->json(new ItemResource($item->load(['units', 'category', 'brand'])));
     }
 
     public function update(UpdateItemRequest $request, Item $item, AuditLogger $logger): JsonResponse
@@ -48,11 +48,22 @@ class ItemController extends Controller
         $item->refresh();
         $logger->log('update', $item, $request->user()?->id, $before, $item->getAttributes(), $request);
 
-        return response()->json(new ItemResource($item->load('units')));
+        return response()->json(new ItemResource($item->load(['units', 'category', 'brand'])));
     }
 
     public function destroy(Request $request, Item $item, AuditLogger $logger): JsonResponse
     {
+        if (
+            $item->inventoryMoves()->exists()
+            || $item->stockLots()->exists()
+            || $item->saleItems()->exists()
+            || $item->serviceConsumptions()->exists()
+        ) {
+            return response()->json([
+                'message' => 'No se puede eliminar este producto porque tiene historial de inventario o movimientos registrados.',
+            ], 422);
+        }
+
         $before = $item->getAttributes();
         $logger->log('delete', $item, $request->user()?->id, $before, null, $request);
         $item->delete();

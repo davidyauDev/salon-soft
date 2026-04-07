@@ -15,7 +15,8 @@ class SaleController extends Controller
     public function index(): JsonResponse
     {
         $sales = \App\Models\Sale::query()
-            ->with('items')
+            ->whereDoesntHave('serviceRecords', fn ($query) => $query->where('source', 'express'))
+            ->with(['items.item', 'client'])
             ->latest('sold_at')
             ->paginate(20);
 

@@ -16,9 +16,15 @@ class StoreClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'full_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required_without:full_name', 'string', 'max:120'],
+            'last_name' => ['required_without:full_name', 'string', 'max:120'],
+            'full_name' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:255'],
+            'dni' => ['nullable', 'string', 'max:30'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'birth_date' => ['nullable', 'date'],
+            'gender' => ['nullable', 'string', 'in:female,male,other,unspecified'],
             'notes' => ['nullable', 'string'],
         ];
     }

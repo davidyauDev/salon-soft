@@ -14,6 +14,7 @@ class SaleResource extends JsonResource
         return [
             'id' => $this->id,
             'client_id' => $this->client_id,
+            'client' => $this->whenLoaded('client'),
             'total_amount' => $this->total_amount,
             'status' => $this->status,
             'payment_method' => $this->payment_method?->value ?? $this->payment_method,

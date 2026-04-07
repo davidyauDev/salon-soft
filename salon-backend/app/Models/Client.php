@@ -14,10 +14,23 @@ class Client extends Model
 
     protected $fillable = [
         'full_name',
+        'first_name',
+        'last_name',
         'phone',
         'email',
+        'dni',
+        'address',
+        'birth_date',
+        'gender',
         'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'birth_date' => 'date',
+        ];
+    }
 
     public function serviceRecords(): HasMany
     {

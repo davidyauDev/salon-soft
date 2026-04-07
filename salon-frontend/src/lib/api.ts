@@ -23,6 +23,10 @@ export async function apiFetch<T>(
     headers.set('Content-Type', 'application/json')
   }
 
+  if (!headers.has('Accept')) {
+    headers.set('Accept', 'application/json')
+  }
+
   const token = getToken()
   if (token) {
     headers.set('Authorization', `Bearer ${token}`)
@@ -37,10 +41,17 @@ export async function apiFetch<T>(
     return null as T
   }
 
-  const data = (await response.json()) as { message?: string } & T
+  const data = (await response.json()) as {
+    message?: string
+    errors?: Record<string, string[]>
+  } & T
 
   if (!response.ok) {
-    throw new Error(data?.message ?? 'Error en la solicitud')
+    const errorMessage = data?.errors
+      ? Object.values(data.errors).flat()[0]
+      : data?.message
+
+    throw new Error(errorMessage ?? 'Error en la solicitud')
   }
 
   return data as T

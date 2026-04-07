@@ -14,13 +14,15 @@ use App\Services\AuditLogger;
 use App\Services\ServiceRecordService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Enums\InventoryMoveType;
+use App\Models\InventoryMove;
 
 class ServiceRecordController extends Controller
 {
     public function index(): JsonResponse
     {
         $records = \App\Models\ServiceRecord::query()
-            ->with(['service', 'stylist.user', 'client'])
+            ->with(['service', 'stylist.user', 'client', 'sale.items.item'])
             ->latest('performed_at')
             ->paginate(20);
 
@@ -73,8 +75,28 @@ class ServiceRecordController extends Controller
             return response()->json(new ServiceRecordResource($record));
         }
 
+        $record->load('consumptions.stockLot');
+
         $before = $record->getAttributes();
         $record->update(['status' => 'cancelled']);
+
+        foreach ($record->consumptions as $consumption) {
+            $lot = $consumption->stockLot;
+            if ($lot) {
+                $lot->increment('quantity_remaining', $consumption->quantity_base);
+            }
+
+            InventoryMove::query()->create([
+                'item_id' => $consumption->item_id,
+                'type' => InventoryMoveType::Adjustment,
+                'quantity_base' => $consumption->quantity_base,
+                'unit_cost_base' => $consumption->unit_cost_base,
+                'reference_type' => 'service_cancel',
+                'reference_id' => $record->id,
+                'user_id' => $request->user()?->id,
+                'moved_at' => now(),
+            ]);
+        }
 
         if ($record->commission) {
             $record->commission->update([

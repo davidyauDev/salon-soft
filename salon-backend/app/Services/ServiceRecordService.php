@@ -30,7 +30,7 @@ class ServiceRecordService
      *   payment_method?:string|null,
      *   performed_at?:string|null,
      *   notes?:string|null,
-     *   consumptions: array<int, array{item_id:int, quantity:float, unit:string}>
+     *   consumptions?: array<int, array{item_id:int, quantity:float, unit:string}>
      * } $payload
      */
     public function create(array $payload, ?int $userId): ServiceRecord
@@ -47,43 +47,49 @@ class ServiceRecordService
                 'notes' => $payload['notes'] ?? null,
             ]);
 
-            foreach ($payload['consumptions'] as $line) {
-                /** @var Item $item */
-                $item = Item::query()->findOrFail($line['item_id']);
+            if (!empty($payload['consumptions'])) {
+                foreach ($payload['consumptions'] as $line) {
+                    /** @var Item $item */
+                    $item = Item::query()->findOrFail($line['item_id']);
 
-                if ($item->type === ItemType::SellOnly) {
-                    throw new \InvalidArgumentException('Item not available for service consumption.');
-                }
+                    if (!$item->is_active) {
+                        throw new \InvalidArgumentException('Item is inactive.');
+                    }
 
-                $factor = $this->unitConverter->factorToBase($item, $line['unit']);
-                $quantityBase = (float) $line['quantity'] * $factor;
+                    if ($item->type === ItemType::SellOnly) {
+                        throw new \InvalidArgumentException('Item not available for service consumption.');
+                    }
 
-                $allocations = $this->stockAllocator->allocate($item, $quantityBase);
+                    $factor = $this->unitConverter->factorToBase($item, $line['unit']);
+                    $quantityBase = (float) $line['quantity'] * $factor;
 
-                foreach ($allocations as $allocation) {
-                    $lot = $allocation['lot'];
-                    $allocQty = $allocation['quantity'];
-                    $unitCostBase = $allocation['unit_cost'];
+                    $allocations = $this->stockAllocator->allocate($item, $quantityBase);
 
-                    $lot->decrement('quantity_remaining', $allocQty);
+                    foreach ($allocations as $allocation) {
+                        $lot = $allocation['lot'];
+                        $allocQty = $allocation['quantity'];
+                        $unitCostBase = $allocation['unit_cost'];
 
-                    $record->consumptions()->create([
-                        'item_id' => $item->id,
-                        'stock_lot_id' => $lot->id,
-                        'quantity_base' => $allocQty,
-                        'unit_cost_base' => $unitCostBase,
-                    ]);
+                        $lot->decrement('quantity_remaining', $allocQty);
 
-                    InventoryMove::query()->create([
-                        'item_id' => $item->id,
-                        'type' => InventoryMoveType::ServiceConsumption,
-                        'quantity_base' => -$allocQty,
-                        'unit_cost_base' => $unitCostBase,
-                        'reference_type' => 'service',
-                        'reference_id' => $record->id,
-                        'user_id' => $userId,
-                        'moved_at' => $payload['performed_at'] ?? now(),
-                    ]);
+                        $record->consumptions()->create([
+                            'item_id' => $item->id,
+                            'stock_lot_id' => $lot->id,
+                            'quantity_base' => $allocQty,
+                            'unit_cost_base' => $unitCostBase,
+                        ]);
+
+                        InventoryMove::query()->create([
+                            'item_id' => $item->id,
+                            'type' => InventoryMoveType::ServiceConsumption,
+                            'quantity_base' => -$allocQty,
+                            'unit_cost_base' => $unitCostBase,
+                            'reference_type' => 'service',
+                            'reference_id' => $record->id,
+                            'user_id' => $userId,
+                            'moved_at' => $payload['performed_at'] ?? now(),
+                        ]);
+                    }
                 }
             }
 

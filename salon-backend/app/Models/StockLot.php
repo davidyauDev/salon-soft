@@ -16,10 +16,13 @@ class StockLot extends Model
 
     protected $fillable = [
         'item_id',
+        'supplier_id',
         'quantity_remaining',
         'cost_per_base',
         'purchased_at',
         'expires_at',
+        'lot_code',
+        'invoice_number',
         'notes',
     ];
 
@@ -41,6 +44,11 @@ class StockLot extends Model
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
     }
 
     public function saleItems(): HasMany

@@ -19,13 +19,23 @@ const props = defineProps<Props>()
 
 <style scoped>
 .kpi-card {
-  background: var(--card);
-  border: 1px solid rgba(17, 15, 20, 0.08);
+  background: #fffdfb;
+  border: 1px solid rgba(25, 25, 25, 0.08);
   border-radius: 20px;
   padding: 18px 20px;
   display: grid;
   gap: 6px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent);
 }
 
 .kpi-title {
@@ -47,10 +57,10 @@ const props = defineProps<Props>()
 }
 
 .trend-up .kpi-change {
-  color: #1f7a57;
+  color: #6a6a6a;
 }
 
 .trend-down .kpi-change {
-  color: #b24b3a;
+  color: #8a3b37;
 }
 </style>
