@@ -455,6 +455,10 @@ function showAllCategories(): void {
   gap: 12px;
 }
 
+.notifications-slot {
+  display: none;
+}
+
 .search-field {
   display: flex;
   align-items: center;
@@ -778,6 +782,30 @@ function showAllCategories(): void {
 }
 
 @media (max-width: 720px) {
+  .header-actions {
+    width: 100%;
+  }
+
+  .catalog-sidebar {
+    display: flex;
+    overflow-x: auto;
+    align-items: stretch;
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .sidebar-head {
+    flex: 0 0 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .category-pill {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
   .service-row {
     grid-template-columns: 1fr;
   }

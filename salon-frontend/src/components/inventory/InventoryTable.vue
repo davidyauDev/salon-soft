@@ -37,14 +37,14 @@ function isLowStock(item: InventoryItem): boolean {
         <span>Acciones</span>
       </div>
       <div v-for="item in props.items" :key="item.id" class="table-row">
-        <span class="item-name">{{ item.name }}</span>
-        <span class="muted">{{ item.category?.name ?? 'Sin categoria' }}</span>
-        <span class="item-type">{{ item.type }}</span>
-        <span class="stock-pill" :class="{ low: isLowStock(item) }">
+        <span class="item-name" data-label="Item">{{ item.name }}</span>
+        <span class="muted" data-label="Categoria">{{ item.category?.name ?? 'Sin categoria' }}</span>
+        <span class="item-type" data-label="Tipo">{{ item.type }}</span>
+        <span class="stock-pill" :class="{ low: isLowStock(item) }" data-label="Stock">
           {{ item.stock_total.toFixed(2) }} {{ item.base_unit }}
         </span>
-        <span class="muted">{{ item.stock_minimum }} {{ item.base_unit }}</span>
-        <div class="row-actions">
+        <span class="muted" data-label="Minimo">{{ item.stock_minimum }} {{ item.base_unit }}</span>
+        <div class="row-actions" data-label="Acciones">
           <button class="btn-ghost" type="button" @click="emit('edit', item.id)">Editar</button>
           <button class="btn-danger" type="button" @click="emit('remove', item.id)">
             Eliminar
@@ -100,5 +100,45 @@ function isLowStock(item: InventoryItem): boolean {
 .muted {
   color: var(--ink-muted);
   font-size: 0.85rem;
+}
+
+@media (max-width: 760px) {
+  .table-row.table-head {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+    align-items: start;
+  }
+
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .table-row > :first-child,
+  .table-row > .row-actions {
+    grid-column: 1 / -1;
+  }
+
+  .row-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
 }
 </style>

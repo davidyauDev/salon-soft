@@ -615,6 +615,10 @@ function closeClientModal(): void {
   width: min(100%, 420px);
 }
 
+.filters-notifications {
+  display: none;
+}
+
 .range-picker {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -669,6 +673,16 @@ function closeClientModal(): void {
   .filters-notifications,
   .range-picker {
     width: 100%;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .tabs button {
+    white-space: nowrap;
+    flex: 0 0 auto;
   }
 }
 </style>

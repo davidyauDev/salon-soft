@@ -23,12 +23,12 @@ defineProps<{
         <span>FECHA DE CITA</span>
       </div>
       <div v-for="row in rows" :key="row.id" class="table-row">
-        <span class="id-cell">{{ row.id }}</span>
-        <span class="status-chip">{{ row.status ?? 'completed' }}</span>
-        <span>{{ row.client?.full_name ?? 'Sin cliente' }}</span>
-        <span>{{ row.service?.name ?? 'Sin servicio' }}</span>
-        <span class="amount">{{ formatCurrency(Number(row.total_amount)) }}</span>
-        <span>{{ formatDate(row.performed_at) }}</span>
+        <span class="id-cell" data-label="ID de cita">{{ row.id }}</span>
+        <span class="status-chip" data-label="Estado">{{ row.status ?? 'completed' }}</span>
+        <span data-label="Cliente">{{ row.client?.full_name ?? 'Sin cliente' }}</span>
+        <span data-label="Servicio">{{ row.service?.name ?? 'Sin servicio' }}</span>
+        <span class="amount" data-label="Costo">{{ formatCurrency(Number(row.total_amount)) }}</span>
+        <span data-label="Fecha de cita">{{ formatDate(row.performed_at) }}</span>
       </div>
     </div>
   </section>
@@ -88,5 +88,40 @@ defineProps<{
   color: var(--ink-muted);
   font-size: 0.95rem;
   text-align: center;
+}
+
+@media (max-width: 760px) {
+  .table-head {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 14px;
+    align-items: start;
+  }
+
+  .table-row > * {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .table-row > *::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .table-row > :first-child,
+  .table-row > :nth-child(2) {
+    grid-column: span 1;
+  }
 }
 </style>
